@@ -1,0 +1,8 @@
+brecksblog README
+
+A high performance blog in 50 lines of code(and 1 .htaccess file). No MySQL needed!
+Stores entries as text files. Doesn't do any type of voting or comments,
+Includes widgets for submitting to social networks, email lists, etc.
+If you want stats, add Google analytics. If you want comments, add Disqus,
+If you want voting, submit to social networking sites.
+You want great html, go somewhere else
