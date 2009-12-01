@@ -6,3 +6,11 @@ Includes widgets for submitting to social networks, email lists, etc.
 If you want stats, add Google analytics. If you want comments, add Disqus,
 If you want voting, submit to social networking sites.
 You want great html, go somewhere else :)
+
+Installation:
+Make posts.php writeable
+
+
+Requirements:
+PHP 5
+Apache with Mod_rewrite enabled
