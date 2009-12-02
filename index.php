@@ -1,88 +1,90 @@
 <?php
 // Documentation located in README. Put your info in first 3 lines.
 class Blog {
-	private $password = "breck";
+	private $blog_password = "breck";
 	public $blog_title = "Breck Yunits' Blog";
 	public $blog_description = "My weblog where I write my thoughts.";
 	public function __construct()
 	{
 		include("posts.php");
 		$this->posts = $posts;
-		arsort($this->posts);
-		foreach ($posts as $key => $array)
+		arsort($this->posts); // Sort the posts in reverse chronological order
+		foreach ($posts as $key => $array) // Necessary for the pretty urls
 		{
-			$this->titles[strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$array['Title'])))] = $key;
+			$this->titles[$this->prettyUrl($array['Title'])] = $key;
 		}
+	}
+	public function prettyUrl($title_string) // Turns a Super-Duper String into a superduper_string
+	{
+		return strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$title_string)));
 	}
 	public function saveBlog()
 	{
-		if (isset($_POST['password']) && $_POST['password'] == $this->password)
+		if (isset($_POST['password']) && $_POST['password'] == $this->blog_password)
 		{
 			if (!isset($_GET['post'])) // create new post
 			{
 				$this->posts[time()] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
+				arsort($this->posts); // Resort in chronological order
 			}
-			elseif (isset($this->posts[$_GET['post']]) && isset($_POST['delete'])) // edit posts
+			elseif (isset($this->posts[$_GET['post']]) && isset($_POST['delete'])) // delete a post
 			{
 				unset($this->posts[$_GET['post']]);
 			}
-			elseif (isset($this->posts[$_GET['post']])) // edit posts
+			elseif (isset($this->posts[$_GET['post']])) // edit a post
 			{
 				$this->posts[$_GET['post']] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
 			}
 			file_put_contents("posts.php", "<?php \$posts= ".var_export($this->posts, true) . "?>");
-			arsort($this->posts);
 		}
 	}
 	public function displayEditor ()
 	{
-		$title = "";
-		$essay = "";
-		$delete = "";
+		$invalid = (isset($_POST['password']) && $_POST['password'] != $this->blog_password ? ' <span style="color:red;">Invalid Password</span>' : "");
+		$title_value = ""; $essay_value = ""; $delete_button = "";
 		if (isset($_GET['post']) && isset($this->posts[$_GET['post']]))
 		{
-			$title = $this->posts[$_GET['post']]['Title'];
-			$essay = $this->posts[$_GET['post']]['Essay'];
-			$delete = "<input type=\"submit\" value=\"Delete\" name=\"delete\" onclick=\"return confirm('DELETE. Are you sure?');\">";
+			$title_value = $this->posts[$_GET['post']]['Title'];
+			$essay_value = $this->posts[$_GET['post']]['Essay'];
+			$delete_button = "<input type=\"submit\" value=\"Delete\" name=\"delete\" onclick=\"return confirm('DELETE. Are you sure?');\">";
 		}
 		$content = <<<LONG
 		<form method="post" action="">
 		<table>
-		<tr><td>Title</td><td><input type="text" name="title" size="25" value="$title"></td></tr>
-		<tr><td>Content</td><td><textarea name="essay" rows="30" cols="80">$essay</textarea></td></tr>
-		<tr><td>Password</td><td><input type="password" name="password"></td></tr>
-		<tr><td></td><td><input type="submit" value="Save">$delete</td></tr></table>
+		<tr><td>Title</td><td><input type="text" name="title" size="25" value="$title_value"></td></tr>
+		<tr><td>Content</td><td><textarea name="essay" rows="30" cols="80">$essay_value</textarea></td></tr>
+		<tr><td>Password</td><td><input type="password" name="password">$invalid</td></tr>
+		<tr><td></td><td><input type="submit" value="Save">$delete_button</td></tr></table>
 		</form>
 		Edit a Post:<br>
 LONG;
-		$edit_posts = "";
 		foreach ($this->posts as $key => $array)
 		{
-			$edit_posts .= "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";
+			$content .= "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";
 		}
-		$this->displayPage("Editor","Edit your blog",$content . $edit_posts);
+		$this->displayPage("Editor","Edit your blog",$content);
 	}
-	public function controller()
+	public function controller() // There are 3 pages: Editor, Post, Homepage
 	{
-		if (isset($_GET['r']) && $_GET['r'] == "/write")
+		if (isset($_GET['r']) && $_GET['r'] == "/write") // Editor
 		{
 			$this->saveBlog();
 			$this->displayEditor();
 		}
-		elseif (isset($_GET['r']) && isset($this->titles[substr($_GET['r'],1)]) )
+		elseif (isset($_GET['r']) && isset($this->titles[substr($_GET['r'],1)]) ) // Post
 		{
 			$post = $this->posts[$this->titles[substr($_GET['r'],1)]];
 			$this->displayPage($post['Title'],substr($post['Essay'],0,100),
 			"<h1>{$post['Title']}</h1><div>".nl2br($post['Essay'])."<br><br>".date("m/d/Y")."</div>");
 		}
 		else { // Homepage
-			$last_five = "";
+			$all_posts = ""; // Might want to limit it to most recent 5 or so posts.
 			foreach ($this->posts as $post)
 			{
-				$last_five .= "<h1><a href=\"".strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$post['Title'])))."\">{$post['Title']}</a></h1><div>".nl2br($post['Essay'])."<br><br>".date("m/d/Y")."</div><br><br>";
+				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".nl2br($post['Essay'])."<br><br>".date("m/d/Y")."</div><br><br>";
 			}
 			$this->displayPage($this->blog_title, $this->blog_description,
-			$last_five); 
+			$all_posts); 
 		}
 	}
 	public function displayPage($title, $description, $body)
@@ -101,18 +103,16 @@ LONG;
 			</head>
 			<body>
 			<div id="content">
-				<?php
-					echo $body;
-				?>
+				<?php echo $body; ?>
 			</div>
 			<div id="sidebar">
 				<a href="/" style="text-decoration:none;"><?php echo $this->blog_title;?></a><br><br>
-				<?php foreach ($this->posts as $post)
-				{
-					?><a href="/<?php 
-					echo strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$post['Title'])));
-					?>"><?php echo $post['Title'];?></a><br><?php
-				}
+				<?php 
+					foreach ($this->posts as $post)
+					{
+						?><a href="/<?php echo $this->prettyUrl($post['Title']);?>">
+						<?php echo $post['Title'];?></a><br><?php
+					}
 				?>
 				<br><a href="/write" rel="nofollow">Admin</a><br>
 			</div>

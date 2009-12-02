@@ -1,7 +1,7 @@
 brecksblog README
 
-A high performance blog in 50 lines of code(and 1 .htaccess file). No MySQL needed!
-Stores entries as one text file. Doesn't do any type of voting or comments.
+A high performance blog in under 100 lines of code(and 1 .htaccess file). No MySQL needed!
+Stores entries as one text file(posts.php). Doesn't do any type of voting or comments.
 If you want stats, add Google analytics. If you want comments, add Disqus, etc.
 If you want voting, submit to social networking sites.
 
@@ -40,3 +40,15 @@ Delete Blog Posts
 Password Protected Creating and Editing
 SEO friendly URLS
 SEO friendly titles, meta descriptions, and h1s
+
+
+TODO:
+Get it under 100 lines.
+Reduce long lines to under 80 characters.
+Add better documentation.
+Clean up code a bit.
+Run some sites off it and see what works, what doesn't.
+Benchmark it.
+Check it for security bugs(obvious one: vulnerable to brute force pw guessing).
+Use sessions to remember password?
+Choose a license. MIT? GPL? no idea about any of those.
