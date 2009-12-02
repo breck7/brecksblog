@@ -15,16 +15,49 @@ class Blog {
 	}
 	public function saveBlog()
 	{
-	
+		if (isset($_POST['password']) && $_POST['password'] == $this->password)
+		{
+			if (!isset($_GET['post'])) // create new post
+			{
+				$this->posts[time()] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
+				file_put_contents("posts.php", "<?php \$posts= ".var_export($this->posts, true) . "?>");
+			}
+			else { // edit posts
+			
+			}
+		}
 	}
-	public function displayEditor ($post_timestamp = 0)
+	public function displayEditor ()
 	{
-	
+		$title = "";
+		$essay = "";
+		if (isset($_GET['post']) && isset($this->posts[$_GET['post']]))
+		{
+			$title = $this->posts[$_GET['post']]['Title'];
+			$essay = $this->posts[$_GET['post']]['Essay'];
+		}
+		$content = <<<LONG
+		<form method="post" action="">
+		<table>
+		<tr><td>Title</td><td><input type="text" name="title" size="25" value="$title"></td></tr>
+		<tr><td>Content</td><td><textarea name="essay" rows="30" cols="80">$essay</textarea></td></tr>
+		<tr><td>Password</td><td><input type="password" name="password"></td></tr>
+		<tr><td></td><td><input type="submit" value="Save"></td></tr></table>
+		</form>
+		Edit a Post:<br>
+LONG;
+		$edit_posts = "";
+		foreach ($this->posts as $key => $array)
+		{
+			$edit_posts .= "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";
+		}
+		$this->displayPage("Editor","Edit your blog",$content . $edit_posts);
 	}
 	public function controller()
 	{
-		if (isset($_GET['r']) && $_GET['r'] == "/editor")
+		if (isset($_GET['r']) && $_GET['r'] == "/write")
 		{
+			$this->saveBlog();
 			$this->displayEditor();
 		}
 		elseif (isset($_GET['r']) && isset($this->titles[substr($_GET['r'],1)]) )
@@ -73,6 +106,7 @@ class Blog {
 					?>"><?php echo $post['Title'];?></a><br><?php
 				}
 				?>
+				<br><a href="/write" rel="nofollow">Admin</a><br>
 			</div>
 			</html>
 		<?php
