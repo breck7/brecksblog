@@ -1,15 +1,12 @@
 brecksblog README
 
 A high performance blog in 50 lines of code(and 1 .htaccess file). No MySQL needed!
-Stores entries as text files. Doesn't do any type of voting or comments,
-Includes widgets for submitting to social networks, email lists, etc.
-If you want stats, add Google analytics. If you want comments, add Disqus,
+Stores entries as one text file. Doesn't do any type of voting or comments.
+If you want stats, add Google analytics. If you want comments, add Disqus, etc.
 If you want voting, submit to social networking sites.
-You want great html, go somewhere else :)
 
 Installation:
 Make posts.php writeable
-
 
 Requirements:
 PHP 5
@@ -43,7 +40,3 @@ Delete Blog Posts
 Password Protected Creating and Editing
 SEO friendly URLS
 SEO friendly titles, meta descriptions, and h1s
-
-
-
-
