@@ -14,3 +14,36 @@ Make posts.php writeable
 Requirements:
 PHP 5
 Apache with Mod_rewrite enabled
+
+Warnings:
+This blogging software is not for everyone.
+It is full of limitations (but easy to extend or modify).
+There are bugs that will occur in rare circumstances.
+The fact that there are bugs is a feature not a defect.
+This is designed to work great in most cases, and not
+designed to work great for rare or special needs. Feel free
+to modify.
+Posts use timestamps as their unique ID. Not sure what will happen if you post
+two things at the same time(it will probably break).
+I've tried to make this as simple as possible and I have made
+decisions on how things work based upon what I believe will
+appeal to the most people.  
+
+Benefits:
+Dead simple to install--just copy the files and start blogging!
+Easy to use--no unneeded features, includes just what's really important!
+Easy to customize--less than 100 lines of code, modify as you want!
+No database required! Simple to setup
+Install multiple blogs fast--just create 1 folder per blog.
+
+Features:
+Create Blog Posts
+Edit Blog Posts
+Delete Blog Posts
+Password Protected Creating and Editing
+SEO friendly URLS
+SEO friendly titles, meta descriptions, and h1s
+
+
+
+
