@@ -43,7 +43,7 @@ class Blog {
 		{
 			$title = $this->posts[$_GET['post']]['Title'];
 			$essay = $this->posts[$_GET['post']]['Essay'];
-			$delete = "<input type=\"submit\" value=\"Delete\" onclick=\"return confirm('DELETE. Are you sure?');\">";
+			$delete = "<input type=\"submit\" value=\"Delete\" name=\"delete\" onclick=\"return confirm('DELETE. Are you sure?');\">";
 		}
 		$content = <<<LONG
 		<form method="post" action="">
