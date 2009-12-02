@@ -14,6 +14,11 @@ Apache with Mod_rewrite enabled
 
 Warnings:
 This blogging software is not for everyone.
+It is NOT written to be extensible. But you can
+easily extend it. There's not much of a development
+path for it. It will be refined but it is unlikely
+new features will be added.
+It is simple blog software easy to customize.
 It is full of limitations (but easy to extend or modify).
 There are bugs that will occur in rare circumstances.
 The fact that there are bugs is a feature not a defect.
@@ -25,6 +30,11 @@ two things at the same time(it will probably break).
 I've tried to make this as simple as possible and I have made
 decisions on how things work based upon what I believe will
 appeal to the most people.  
+Other things that may break it:
+Having titles with the same name(or titles, when cleaned, that are identical)
+Posting a lot of posts (as long as posts.php is in memory fine, but
+if you have a few MB of posts, you don't want it going to disk I dont think)
+
 
 Benefits:
 Dead simple to install--just copy the files and start blogging!
