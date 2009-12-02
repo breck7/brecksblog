@@ -58,6 +58,10 @@ class Blog {
 		</form>
 		Edit a Post:<br>
 LONG;
+		if (!is_writable("posts.php"))
+		{
+			$content = "<span style=\"color:red;\">WARNING! posts.php not writeable</span>".$content;
+		}
 		foreach ($this->posts as $key => $array)
 		{
 			$content .= "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";
@@ -95,7 +99,7 @@ LONG;
 			<style type="text/css">
 			body {font-family: Georgia; color: #888888;}
 			h1 {margin-top: 0px;}
-			#content {float: left;}
+			#content {float: left;width: 80%;}
 			#sidebar {float: right;}
 			</style>
 			<title><?php echo $title;?></title>
