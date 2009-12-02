@@ -64,13 +64,13 @@ LONG;
 		{
 			$post = $this->posts[$this->titles[substr($_GET['r'],1)]];
 			$this->displayPage($post['Title'],substr($post['Essay'],0,100),
-			"<h1>{$post['Title']}</h1><div>{$post['Essay']}</div>");
+			"<h1>{$post['Title']}</h1><div>{$post['Essay']}<br><br>".date("m/d/Y")."</div>");
 		}
 		else { // Homepage
 			$last_five = "";
 			foreach ($this->posts as $post)
 			{
-				$last_five .= "<h1><a href=\"".strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$post['Title'])))."\">{$post['Title']}</a></h1><div>{$post['Essay']}</div>";
+				$last_five .= "<h1><a href=\"".strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$post['Title'])))."\">{$post['Title']}</a></h1><div>{$post['Essay']}<br><br>".date("m/d/Y")."</div><br><br>";
 			}
 			$this->displayPage($this->blog_title, $this->blog_description,
 			$last_five); 
@@ -86,6 +86,13 @@ LONG;
 				font-family: Georgia;
 				color: #888888;
 			}
+			h1 {
+				margin-top: 0px;
+			}
+			#content {
+				float: left;
+				
+			}
 			#sidebar {
 				float: right;
 			}
@@ -94,11 +101,13 @@ LONG;
 			<meta name="description" content="<?php echo $description;?>">
 			</head>
 			<body>
+			<div id="content">
 			<?php
 			echo $body;
 			?>
+			</div>
 			<div id="sidebar">
-				<a href="/">Home</a><br>
+				<a href="/" style="text-decoration:none;"><?php echo $this->blog_title;?></a><br><br>
 				<?php foreach ($this->posts as $post)
 				{
 					?><a href="/<?php 
