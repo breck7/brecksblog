@@ -1,5 +1,5 @@
 <?php
-// Documentation located in README. Put your info in first 3 lines.
+// Documentation located in README.
 class Blog {
 	private $blog_password = "breck";
 	public $blog_title = "Breck Yunits' Blog";
@@ -8,7 +8,6 @@ class Blog {
 	{
 		include("posts.php");
 		$this->posts = $posts;
-		arsort($this->posts); // Sort the posts in reverse chronological order
 		foreach ($posts as $key => $array) // Necessary for the pretty urls
 		{
 			$this->titles[$this->prettyUrl($array['Title'])] = $key;
@@ -25,7 +24,6 @@ class Blog {
 			if (!isset($_GET['post'])) // create new post
 			{
 				$this->posts[time()] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
-				arsort($this->posts); // Resort in chronological order
 			}
 			elseif (isset($this->posts[$_GET['post']]) && isset($_POST['delete'])) // delete a post
 			{
@@ -35,6 +33,7 @@ class Blog {
 			{
 				$this->posts[$_GET['post']] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
 			}
+			krsort($this->posts); // Sort the posts in reverse chronological order
 			file_put_contents("posts.php", "<?php \$posts= ".var_export($this->posts, true) . "?>");
 		}
 	}
@@ -79,13 +78,13 @@ LONG;
 		{
 			$post = $this->posts[$this->titles[substr($_GET['r'],1)]];
 			$this->displayPage($post['Title'],substr($post['Essay'],0,100),
-			"<h1>{$post['Title']}</h1><div>".nl2br($post['Essay'])."<br><br>".date("m/d/Y")."</div>");
+			"<h1>{$post['Title']}</h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y")."</div>");
 		}
 		else { // Homepage
 			$all_posts = ""; // Might want to limit it to most recent 5 or so posts.
 			foreach ($this->posts as $post)
 			{
-				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".nl2br($post['Essay'])."<br><br>".date("m/d/Y")."</div><br><br>";
+				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y")."</div><br><br>";
 			}
 			$this->displayPage($this->blog_title, $this->blog_description,
 			$all_posts); 
@@ -120,6 +119,7 @@ LONG;
 				?>
 				<br><a href="/write" rel="nofollow">Admin</a><br>
 			</div>
+			</body>
 			</html>
 		<?php
 	}
