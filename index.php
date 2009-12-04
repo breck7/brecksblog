@@ -1,5 +1,7 @@
 <?php
 // Documentation located in README.
+// Licensed under the MIT: http://www.opensource.org/licenses/mit-license.php
+// Copyright 2009 Breck Yunits  
 class Blog {
 	private $blog_password = "breck";
 	public $blog_title = "Breck Yunits' Blog";
