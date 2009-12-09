@@ -1,24 +1,23 @@
 <?php
 class Blog {
-	private $blog_password = "changeme";
-	public $blog_title = "My Blog";
-	public $blog_description = "My weblog where I write my thoughts.";
 	public function __construct()
 	{
+		include("config.php");
 		include("posts.php");
 		$this->posts = $posts;
 		foreach ($posts as $key => $array) // Necessary for the pretty urls
 		{
 			$this->titles[$this->prettyUrl($array['Title'])] = $key;
 		}
+		$this->controller();
 	}
-	public function prettyUrl($title_string) // Turns a Super-Duper String into a superduper_string
+	public function prettyUrl($title_string) // Turns a "$String' Like THIS" into a string_like_this
 	{
 		return strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$title_string)));
 	}
 	public function saveBlog()
 	{
-		if (isset($_POST['password']) && $_POST['password'] == $this->blog_password)
+		if (isset($_POST['password']) && $_POST['password'] == BLOG_PASSWORD)
 		{
 			if (!isset($_GET['post'])) // create new post
 			{
@@ -38,7 +37,7 @@ class Blog {
 	}
 	public function displayEditor ()
 	{
-		$invalid = (isset($_POST['password']) && $_POST['password'] != $this->blog_password ? ' <span style="color:red;">Invalid Password</span>' : "");
+		$invalid = (isset($_POST['password']) && $_POST['password'] != BLOG_PASSWORD ? ' <span style="color:red;">Invalid Password</span>' : "");
 		$title_value = ""; $essay_value = ""; $delete_button = "";
 		if (isset($_GET['post']) && isset($this->posts[$_GET['post']]))
 		{
@@ -56,11 +55,11 @@ class Blog {
 		</form>
 		Edit a Post:<br>
 LONG;
-		if (!is_writable("posts.php"))
+		if (!is_writable("posts.php")) // can remove this once we do install.php
 		{
 			$content = "<span style=\"color:red;\">WARNING! posts.php not writeable</span>".$content;
 		}
-		foreach ($this->posts as $key => $array)
+		foreach ($this->posts as $key => $array) // display links to edit posts
 		{
 			$content .= "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";
 		}
@@ -85,7 +84,7 @@ LONG;
 			{
 				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y", $key )."</div><br><br>";
 			}
-			$this->displayPage($this->blog_title, $this->blog_description,
+			$this->displayPage(BLOG_TITLE, BLOG_DESCRIPTION,
 			$all_posts); 
 		}
 	}
@@ -106,7 +105,7 @@ LONG;
 				<?php echo $body; ?>
 			</td>
 			<td valign="top" style="width:30%; text-align:right;">
-				<a href="/" style="text-decoration:none;"><?php echo $this->blog_title;?></a><br><br>
+				<a href="/" style="text-decoration:none;"><?php echo BLOG_TITLE;?></a><br><br>
 				<?php 
 					foreach ($this->posts as $post)
 					{
@@ -117,11 +116,11 @@ LONG;
 				<br><a href="/write" rel="nofollow">Admin</a><br>
 			</td>
 			</tr></table>
+			<?php blog_analytics();?>
 			</body>
 			</html>
 		<?php
 	}
 }
 $blog = new Blog;
-$blog->controller();
 ?>
