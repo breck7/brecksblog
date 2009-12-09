@@ -1,64 +1,115 @@
 brecksblog README
 
-A high performance blog in under 130 lines of code(and 1 .htaccess file). No MySQL needed!
-Stores entries as one text file(posts.php). Doesn't do any type of voting or comments.
-If you want stats, add Google analytics. If you want comments, add Disqus, etc.
-If you want voting, submit to social networking sites.
-
-Installation:
-Make posts.php writeable
-
-Requirements:
-PHP 5
-Apache with Mod_rewrite enabled
-
-Warnings:
-This blogging software is not for everyone.
-It is NOT written to be extensible. But you can
-easily extend it. There's not much of a development
-path for it. It will be refined but it is unlikely
-new features will be added.
-It is simple blog software easy to customize.
-It is full of limitations (but easy to extend or modify).
-There are bugs that will occur in rare circumstances.
-The fact that there are bugs is a feature not a defect.
-This is designed to work great in most cases, and not
-designed to work great for rare or special needs. Feel free
-to modify.
-Posts use timestamps as their unique ID. Not sure what will happen if you post
-two things at the same time(it will probably break).
-I've tried to make this as simple as possible and I have made
-decisions on how things work based upon what I believe will
-appeal to the most people.  
-Other things that may break it:
-Having titles with the same name(or titles, when cleaned, that are identical)
-Posting a lot of posts (as long as posts.php is in memory fine, but
-if you have a few MB of posts, you don't want it going to disk I dont think)
+Contents:
+1. What is brecksblog? What does it require?
+2. What websites are powered by brecksblog?
+3. How do I install brecksblog? 
+4. What are the core benefits of brecksblog?
+5. What features does it have?
+6. What features will not be added to brecksblog?
+7. What are known issues?
+8. How do I upgrade my version?
+9. How do I get help?
+10. Who contributes to brecksblog?
+11. What is brecksblog licensed under?
+12. Todo
 
 
-Benefits:
-Dead simple to install--just copy the files and start blogging!
-Easy to use--no unneeded features, includes just what's really important!
-Easy to customize--less than 100 lines of code, modify as you want!
-No database required! Simple to setup
-Install multiple blogs fast--just create 1 folder per blog.
-
-Features:
-Create Blog Posts
-Edit Blog Posts
-Delete Blog Posts
-Password Protected Creating and Editing
-SEO friendly URLS
-SEO friendly titles, meta descriptions, and h1s
 
 
-TODO:
-Get it under 100 lines.
-Reduce long lines to under 80 characters.
-Add better documentation.
-Clean up code a bit.
-Run some sites off it and see what works, what doesn't.
-Benchmark it.
-Check it for security bugs(obvious one: vulnerable to brute force pw guessing).
-Use sessions to remember password?
-Choose a license. MIT? GPL? no idea about any of those.
+1. What is brecksblog?
+
+A high performance blog in under 130 lines of code! No MySQL needed!
+breckblog helps you focus on what's important: content. You need PHP and
+Apache with mod_rewrite for it to work.
+
+2. What websites are powered by brecksblog?
+
+http://www.breckyunits.com
+
+Contact breck7 at gmail.com if you'd like your site added to the list.
+
+3. How do I install brecksblog?
+
+Two ways: simple and advanced.
+
+Simple: Download the install.php script. Upload it to your web directory. Access it in your browser, like http://yourdomain.com/pathtobrecksblog/install.php
+
+Follow the onscreen instructions. You may have to make sure permissions are set correctly on that directory. That's it!
+
+Advanced: Download or copy the source files into your root directory. Change the config.php settings in a text editor. Save and run. You do not need install.php.
+
+4. Benefits
+
+- Simple software forces you to focus on what's important in blogging: content!
+- Does great SEO for you! All you need to do is write great content and get inbound links
+- Simple! No complicated database or lots of files to install.
+- Get publishing in no time. Get visitors, earn money(if that's your goal)!
+- Perfect for lazy people. Quickest software in terms of writing and editing posts.
+- Easy to extend(if you want to). While we'll keep it small and simple, feel free to customize your own version.
+- Create multiple blogs fast! Just make one folder per blog.
+
+5. Features
+
+- Stores entries as one text file(posts.php). No database needed!
+- Easy to write, edit, and delete posts!
+- No login needed. Just use your password each time you edit a page.
+- SEO friendly URLs, titles, and meta description.
+- Less than 130 lines of code! Easy to extend and modify.
+- Simple, clean layout. Easy to change CSS.
+- You can add HTML, Javascript, and CSS to your posts.
+- Add Google Analytics and any other analytics in the config.php
+- Works great under loads (so far).
+- Easy 1 file install (coming soon).
+- Easy 1 click updates (coming soon).
+- No clutter! No comments, etc., 
+- Easy to add real time stats(coming soon).
+
+6. (un)Features
+
+The following will likely never be added (at least in this branch) to breckblog
+
+- Comments. You can add Disqus, or just submit your content to social sites with comments.
+- Voting. Social sites are great for that.
+- "Share this on". Just go to the site and submit it.
+- Themes. We'll improve the basic one, but may not add any more.
+- Drafts.
+- Multiple authors.
+- Plugins.
+- Widgets.
+
+
+7. Known issues
+
+- File permissions. Your file permissions have to be set correctly. Make sure posts.php and config.php are writeable.
+- Mod_rewrite. You need mod_rewrite enabled for it to work.
+- Untested. This software has not been thoroughly tested.
+- Password. If someone guesses your password, it's a serious security vulnerability so far.
+- Brute force password guessing. There is no protection yet against brute force guessing attempts.
+- Things that may break it: posts with the same timestamp or name. Having lots of posts. Getting lots of traffic while editing.
+- No backups. There is no system yet to auto backup posts.php. This may be added.
+
+8. How to upgrade
+
+Upgrades are coming soon.
+
+9. How do I get help?
+
+Contact the admins through github or breck7 at gmail.com.
+
+10. Who contributes to brecksblog?
+
+Breck Yunits,
+
+11. License
+
+Released under the MIT license.
+
+12. Todo
+
+- Get it under 100 lines.
+- Reduce long lines to under 80 characters.
+- Better security
+- 1 file install
+- Move config variables to config.php
+- 1 click updates
