@@ -37,7 +37,8 @@ Simple: Download the install.php script. Upload it to your web directory. Access
 
 Follow the onscreen instructions. You may have to make sure permissions are set correctly on that directory. That's it!
 
-Advanced: Download or copy the source files into your root directory. Change the config.php settings in a text editor. Save and run. You do not need install.php.
+Advanced: Download or copy the 4 source files(index.php, .htaccess, posts.php, config.php) into your root directory. 
+Change the config.php settings in a text editor. Save and run. You do not need install.php (or this README).
 
 4. Benefits
 
