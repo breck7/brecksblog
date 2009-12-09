@@ -1,10 +1,7 @@
 <?php
-// Documentation located in README.
-// Licensed under the MIT: http://www.opensource.org/licenses/mit-license.php
-// Copyright 2009 Breck Yunits  
 class Blog {
-	private $blog_password = "breck";
-	public $blog_title = "Breck Yunits' Blog";
+	private $blog_password = "changeme";
+	public $blog_title = "My Blog";
 	public $blog_description = "My weblog where I write my thoughts.";
 	public function __construct()
 	{
@@ -80,13 +77,13 @@ LONG;
 		{
 			$post = $this->posts[$this->titles[substr($_GET['r'],1)]];
 			$this->displayPage($post['Title'],substr($post['Essay'],0,100),
-			"<h1>{$post['Title']}</h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y")."</div>");
+			"<h1>{$post['Title']}</h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[substr($_GET['r'],1)])."</div>");
 		}
 		else { // Homepage
 			$all_posts = ""; // Might want to limit it to most recent 5 or so posts.
-			foreach ($this->posts as $post)
+			foreach ($this->posts as $key => $post)
 			{
-				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y")."</div><br><br>";
+				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y", $key )."</div><br><br>";
 			}
 			$this->displayPage($this->blog_title, $this->blog_description,
 			$all_posts); 
@@ -98,19 +95,17 @@ LONG;
 			<html>
 			<head>
 			<style type="text/css">
-			body {font-family: Georgia; color: #888888;}
+			body {font-family: arial; color: #222222; padding: 20px;}
 			h1 {margin-top: 0px;}
-			#content {float: left;width: 80%;}
-			#sidebar {float: right;}
 			</style>
 			<title><?php echo $title;?></title>
 			<meta name="description" content="<?php echo $description;?>">
 			</head>
-			<body>
-			<div id="content">
+			<body><table><tr>
+			<td>
 				<?php echo $body; ?>
-			</div>
-			<div id="sidebar">
+			</td>
+			<td valign="top" style="width:30%; text-align:right;">
 				<a href="/" style="text-decoration:none;"><?php echo $this->blog_title;?></a><br><br>
 				<?php 
 					foreach ($this->posts as $post)
@@ -120,7 +115,8 @@ LONG;
 					}
 				?>
 				<br><a href="/write" rel="nofollow">Admin</a><br>
-			</div>
+			</td>
+			</tr></table>
 			</body>
 			</html>
 		<?php
