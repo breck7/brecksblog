@@ -37,8 +37,8 @@ Simple: Download the install.php script. Upload it to your web directory. Access
 
 Follow the onscreen instructions. You may have to make sure permissions are set correctly on that directory. That's it!
 
-Advanced: Download or copy the 4 source files(index.php, .htaccess, posts.php, config.php) into your root directory. 
-Change the config.php settings in a text editor. Save and run. You do not need install.php (or this README).
+Advanced: Download or copy the 4 source files(index.php, .htaccess, posts.php, settings.php) into your root directory. 
+Change the settings.php settings in a text editor. Save and run. You do not need install.php (or this README).
 
 4. Benefits
 
@@ -59,7 +59,7 @@ Change the config.php settings in a text editor. Save and run. You do not need i
 - Less than 130 lines of code! Easy to extend and modify.
 - Simple, clean layout. Easy to change CSS.
 - You can add HTML, Javascript, and CSS to your posts.
-- Add Google Analytics and any other analytics in the config.php
+- Add Google Analytics and any other analytics in the settings.php
 - Works great under loads (so far).
 - Easy 1 file install (coming soon).
 - Easy 1 click updates (coming soon).
@@ -82,7 +82,7 @@ The following will likely never be added (at least in this branch) to breckblog
 
 7. Known issues
 
-- File permissions. Your file permissions have to be set correctly. Make sure posts.php and config.php are writeable.
+- File permissions. Your file permissions have to be set correctly. Make sure posts.php and settings.php are writeable.
 - Mod_rewrite. You need mod_rewrite enabled for it to work.
 - Untested. This software has not been thoroughly tested.
 - Password. If someone guesses your password, it's a serious security vulnerability so far.
@@ -112,5 +112,4 @@ Released under the MIT license.
 - Reduce long lines to under 80 characters.
 - Better security
 - 1 file install
-- Move config variables to config.php
 - 1 click updates (maybe)

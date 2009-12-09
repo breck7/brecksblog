@@ -2,7 +2,7 @@
 class Blog {
 	public function __construct()
 	{
-		include("config.php");
+		include("settings.php");
 		include("posts.php");
 		$this->posts = $posts;
 		foreach ($posts as $key => $array) // Necessary for the pretty urls
