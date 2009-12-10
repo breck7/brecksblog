@@ -113,3 +113,5 @@ Released under the MIT license.
 - Better security
 - 1 file install
 - 1 click updates (maybe)
+- Allow multiple blogs from same domain. Not sure if /, blog/, blog/blog2/ will work
+- Enable 1 file install for php versions earlier than 5.3 
