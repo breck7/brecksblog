@@ -78,6 +78,10 @@ LONG;
 			$this->displayPage($post['Title'],substr($post['Essay'],0,100),
 			"<h1>{$post['Title']}</h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[substr($_GET['r'],1)])."</div>");
 		}
+		elseif (isset($_GET['r']) && $_GET['r'] == "/feed") // RSS Feed
+		{
+			$this->displayFeed();
+		}
 		else { // Homepage
 			$all_posts = ""; // Might want to limit it to most recent 5 or so posts.
 			foreach ($this->posts as $key => $post)
@@ -119,6 +123,29 @@ LONG;
 			<?php blog_analytics();?>
 			</body>
 			</html>
+		<?php
+	}
+	public function displayFeed()
+	{
+		header('Content-Type: text/xml');
+		?><?php echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';?>
+			<rss version="0.91">
+			<channel>
+			<title><?php echo BLOG_TITLE;?></title>
+			<link><?php echo BLOG_URL;?></link>
+			<description><?php echo BLOG_DESCRIPTION;?></description>
+			<language>en-us</language>
+				<?php 
+					foreach ($this->posts as $post)
+					{
+						?><item>
+						<title><?php echo $post['Title'];?></title>
+						<link><?php echo BLOG_URL . $this->prettyUrl($post['Title']);?></link>
+						</item><?php
+					}
+				?>
+			</channel>
+			</rss>
 		<?php
 	}
 }
