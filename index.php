@@ -67,20 +67,24 @@ LONG;
 	}
 	public function controller() // There are 3 pages: Editor, Post, Homepage
 	{
-		if (isset($_GET['r']) && $_GET['r'] == "/write") // Editor
+		if (isset($_GET['r']))
 		{
-			$this->saveBlog();
-			$this->displayEditor();
-		}
-		elseif (isset($_GET['r']) && isset($this->titles[substr($_GET['r'],1)]) ) // Post
-		{
-			$post = $this->posts[$this->titles[substr($_GET['r'],1)]];
-			$this->displayPage($post['Title'],substr($post['Essay'],0,100),
-			"<h1>{$post['Title']}</h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[substr($_GET['r'],1)])."</div>");
-		}
-		elseif (isset($_GET['r']) && $_GET['r'] == "/feed") // RSS Feed
-		{
-			$this->displayFeed();
+			$url = array_pop(explode("/",$_GET['r']));  // Get the Redirect Path
+			if ($url == "write") // Editor
+			{
+				$this->saveBlog();
+				$this->displayEditor();
+			}
+			elseif (isset($this->titles[$url]) ) // Post
+			{
+				$post = $this->posts[$this->titles[substr($_GET['r'],1)]];
+				$this->displayPage($post['Title'],substr($post['Essay'],0,100),
+				"<h1>{$post['Title']}</h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[substr($_GET['r'],1)])."</div>");
+			}
+			elseif ($url == "feed") // RSS Feed
+			{
+				$this->displayFeed();
+			}
 		}
 		else { // Homepage
 			$all_posts = ""; // Might want to limit it to most recent 5 or so posts.
@@ -102,7 +106,7 @@ LONG;
 			h1 {margin-top: 0px;}
 			</style>
 			<title><?php echo $title;?></title>
-			<meta name="description" content="<?php echo $description;?>">
+			<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
 			</head>
 			<body><table><tr>
 			<td>
