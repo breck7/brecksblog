@@ -77,9 +77,9 @@ LONG;
 			}
 			elseif (isset($this->titles[$url]) ) // Post
 			{
-				$post = $this->posts[$this->titles[substr($_GET['r'],1)]];
+				$post = $this->posts[$this->titles[$url]];
 				$this->displayPage($post['Title'],substr($post['Essay'],0,100),
-				"<h1>{$post['Title']}</h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[substr($_GET['r'],1)])."</div>");
+				"<h1>{$post['Title']}</h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[$url])."</div>");
 			}
 			elseif ($url == "feed") // RSS Feed
 			{
@@ -113,15 +113,15 @@ LONG;
 				<?php echo $body; ?>
 			</td>
 			<td valign="top" style="width:30%; text-align:right;">
-				<a href="/" style="text-decoration:none;"><?php echo BLOG_TITLE;?></a><br><br>
+				<a href="index.php" style="text-decoration:none;"><?php echo BLOG_TITLE;?></a><br><br>
 				<?php 
 					foreach ($this->posts as $post)
 					{
-						?><a href="/<?php echo $this->prettyUrl($post['Title']);?>">
+						?><a href="<?php echo $this->prettyUrl($post['Title']);?>">
 						<?php echo $post['Title'];?></a><br><?php
 					}
 				?>
-				<br><a href="/write" rel="nofollow">Admin</a><br>
+				<br><a href="write" rel="nofollow">Admin</a><br>
 			</td>
 			</tr></table>
 			<?php blog_analytics();?>
