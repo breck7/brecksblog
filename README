@@ -33,7 +33,7 @@ Contact breck7 at gmail.com if you'd like your site added to the list.
 
 Two ways: simple and advanced.
 
-Simple: Download the install.php script. Upload it to your web directory. Access it in your browser, like http://yourdomain.com/pathtobrecksblog/install.php
+Simple(Does not work yet): Download the install.php script. Upload it to your web directory. Access it in your browser, like http://yourdomain.com/pathtobrecksblog/install.php
 
 Follow the onscreen instructions. You may have to make sure permissions are set correctly on that directory. That's it!
 
@@ -110,8 +110,11 @@ Released under the MIT license.
 
 - Get it under 100 lines.
 - Reduce long lines to under 80 characters.
-- Better security
-- 1 file install
+- Better security (specifically against brute force attacks)
+- 1 file install (maybe)
 - 1 click updates (maybe)
-- Allow multiple blogs from same domain. Not sure if /, blog/, blog/blog2/ will work
 - Enable 1 file install for php versions earlier than 5.3 
+- Generate sitemaps for Google?
+- Auto submit to blog search engines?
+- Allow very basic theming?
+- Allow something on the sidebar like "about me"?
