@@ -3,7 +3,12 @@ define("BLOG_PASSWORD","changeme");
 define("BLOG_TITLE","My Blog");
 define("BLOG_DESCRIPTION","My weblog where I write my thoughts.");
 define("BLOG_URL", "http://www.myblog.com/");
-
+function sidebar()
+{
+	?>
+	<!--Put anything you want here  -->
+	<?php
+}
 function blog_analytics()
 {
 	?>

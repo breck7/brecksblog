@@ -128,6 +128,7 @@ h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
 						?><a href="<?php echo $this->prettyUrl($post['Title']);?>">
 						<?php echo $post['Title'];?></a><?php
 					}
+					sidebar();
 				?>
 				<br><a href="write" rel="nofollow">Admin</a></div>
 			</td>
