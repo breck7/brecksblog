@@ -103,7 +103,7 @@ LONG;
 			<head>
 			<style type="text/css">
 			body {font-family: arial; color: #222222; padding: 20px;}
-h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:.8em;}
+h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
                         h1 a{text-decoration:none; color: #0000AA;}
 			/* theme inspired by http://crypto.stanford.edu/~blynn/c/index.html */
 			#sidebar {font-size:.8em;background:#F9F9F9;
