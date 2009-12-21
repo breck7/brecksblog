@@ -104,6 +104,12 @@ LONG;
 			<style type="text/css">
 			body {font-family: arial; color: #222222; padding: 20px;}
 			h1 {margin-top: 0px;}
+			/* theme inspired by http://crypto.stanford.edu/~blynn/c/index.html */
+			#sidebar {font-size:.8em;background:#F9F9F9;
+			margin-left: 40px;padding: 8px;}
+			#sidebar a{display: block; padding: 3px;
+			text-decoration:none; color:#0000AA;}
+			#sidebar a:hover {background: #f9f9aa;}
 			</style>
 			<title><?php echo $title;?></title>
 			<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
@@ -112,16 +118,17 @@ LONG;
 			<td>
 				<?php echo $body; ?>
 			</td>
-			<td valign="top" style="width:30%; text-align:right;">
+			<td valign="top" style="width:30%;">
+			<div id="sidebar">
 				<a href="index.php" style="text-decoration:none;"><?php echo BLOG_TITLE;?></a><br><br>
 				<?php 
 					foreach ($this->posts as $post)
 					{
 						?><a href="<?php echo $this->prettyUrl($post['Title']);?>">
-						<?php echo $post['Title'];?></a><br><?php
+						<?php echo $post['Title'];?></a><?php
 					}
 				?>
-				<br><a href="write" rel="nofollow">Admin</a><br>
+				<br><a href="write" rel="nofollow">Admin</a></div>
 			</td>
 			</tr></table>
 			<?php blog_analytics();?>
