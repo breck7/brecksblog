@@ -61,7 +61,7 @@ LONG;
 		$this->edit_posts_links = "<br><br>Edit a Post:<br>";
 		foreach ($this->posts as $key => $array) // display links to edit posts
 		{
-			$this->edit_posts_links .= "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";
+			$this->edit_posts_links .= "<a href=\"write?post=".$key."\">{$array['Title']}</a>";
 		}
 		$this->displayPage("Editor","Edit your blog",$content);
 	}
