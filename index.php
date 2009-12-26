@@ -116,7 +116,7 @@ h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
 			<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
 			</head>
 			<body><table width="100%"><tr>
-			<td>
+			<td valign="top">
 				<?php echo $body; ?>
 			</td>
 			<td valign="top" style="width:30%;">
