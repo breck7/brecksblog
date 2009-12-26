@@ -49,19 +49,19 @@ class Blog {
 		<form method="post" action="">
 		<table style="width:100%;">
 		<tr><td>Title</td><td style="width:100%;"><input type="text" name="title" style="width:100%;" value="$title_value"></td></tr>
-		<tr><td>Content</td><td><textarea name="essay" rows="20" style="width:100%;">$essay_value</textarea></td></tr>
+		<tr><td>Content</td><td><textarea name="essay" rows="15" style="width:100%;">$essay_value</textarea></td></tr>
 		<tr><td>Password</td><td><input type="password" name="password">$invalid</td></tr>
 		<tr><td></td><td><input type="submit" value="Save">$delete_button</td></tr></table>
 		</form>
-		Edit a Post:<br>
 LONG;
 		if (!is_writable("posts.php")) // can remove this once we do install.php
 		{
 			$content = "<span style=\"color:red;\">WARNING! posts.php not writeable</span>".$content;
 		}
+		$this->edit_posts_links = "<br><br>Edit a Post:<br>";
 		foreach ($this->posts as $key => $array) // display links to edit posts
 		{
-			$content .= "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";
+			$this->edit_posts_links .= "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";
 		}
 		$this->displayPage("Editor","Edit your blog",$content);
 	}
@@ -130,7 +130,9 @@ h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
 					}
 					sidebar();
 				?>
-				<br><a href="write" rel="nofollow">Admin</a></div>
+				<br><a href="write" rel="nofollow">Admin</a>
+				<?php echo (isset($this->edit_posts_links) ? $this->edit_posts_links : ""); ?>
+				</div>
 			</td>
 			</tr></table>
 			<?php blog_analytics();?>
