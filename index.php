@@ -47,9 +47,9 @@ class Blog {
 		}
 		$content = <<<LONG
 		<form method="post" action="">
-		<table>
-		<tr><td>Title</td><td><input type="text" name="title" size="25" value="$title_value"></td></tr>
-		<tr><td>Content</td><td><textarea name="essay" rows="30" cols="80">$essay_value</textarea></td></tr>
+		<table style="width:100%;">
+		<tr><td>Title</td><td style="width:100%;"><input type="text" name="title" style="width:100%;" value="$title_value"></td></tr>
+		<tr><td>Content</td><td><textarea name="essay" rows="20" style="width:100%;">$essay_value</textarea></td></tr>
 		<tr><td>Password</td><td><input type="password" name="password">$invalid</td></tr>
 		<tr><td></td><td><input type="submit" value="Save">$delete_button</td></tr></table>
 		</form>
@@ -115,7 +115,7 @@ h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
 			<title><?php echo $title;?></title>
 			<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
 			</head>
-			<body><table><tr>
+			<body><table width="100%"><tr>
 			<td>
 				<?php echo $body; ?>
 			</td>

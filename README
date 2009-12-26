@@ -117,4 +117,7 @@ Released under the MIT license.
 - Generate sitemaps for Google?
 - Auto submit to blog search engines?
 - Allow very basic theming?
-- Allow something on the sidebar like "about me"?
+- Make it easy to include external Javascript libraries for:
+> backup/autosave(etherpad like)
+> wysiwyg
+> comments
