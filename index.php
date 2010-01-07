@@ -1,9 +1,16 @@
 <?php
 class Blog {
+	var $format_single_post;
+
 	public function __construct()
 	{
+		$this->format_single_post = 'nl2br'; // default format func
+
 		include("settings.php");
 		include("posts.php");
+		if (file_exists("markdown.php")) {
+			include_once("markdown.php"); $this->format_single_post = 'Markdown';
+		}
 		$this->posts = $posts;
 		foreach ($posts as $key => $array) // Necessary for the pretty urls
 		{
@@ -79,7 +86,7 @@ LONG;
 			{
 				$post = $this->posts[$this->titles[$url]];
 				$this->displayPage($post['Title'],substr($post['Essay'],0,100),
-				"<h1>{$post['Title']}</h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[$url])."</div>");
+				"<h1>{$post['Title']}</h1><div>".call_user_func($this->format_single_post, $post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[$url])."</div>");
 			}
 			elseif ($url == "feed") // RSS Feed
 			{
@@ -90,7 +97,7 @@ LONG;
 			$all_posts = ""; // Might want to limit it to most recent 5 or so posts.
 			foreach ($this->posts as $key => $post)
 			{
-				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".nl2br($post['Essay'])."<br><br>Posted ".date("m/d/Y", $key )."</div><br><br>";
+				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".call_user_func($this->format_single_post, $post['Essay'])."<br><br>Posted ".date("m/d/Y", $key )."</div><br><br>";
 			}
 			$this->displayPage(BLOG_TITLE, BLOG_DESCRIPTION,
 			$all_posts); 
