@@ -1,11 +1,11 @@
 <?php
 class Blog {
+	var $version = "v0.8";
 	var $format_single_post;
-
 	public function __construct()
 	{
+		$this->install();
 		$this->format_single_post = 'nl2br'; // default format func
-
 		include("settings.php");
 		include("posts.php");
 		if (file_exists("markdown.php")) {
@@ -61,11 +61,8 @@ class Blog {
 		<tr><td></td><td><input type="submit" value="Save">$delete_button</td></tr></table>
 		</form>
 LONG;
-		if (!is_writable("posts.php")) // can remove this once we do install.php
-		{
-			$content = "<span style=\"color:red;\">WARNING! posts.php not writeable</span>".$content;
-		}
-		$this->edit_posts_links = "<br><br>Edit a Post:<br>";
+		$content = (is_writable("posts.php") ? "" : "<span style=\"color:red;\">WARNING! posts.php not writeable</span>" ) . $content;
+		$this->edit_posts_links = "<br>brecksblog version: {$this->version}<br><br>Edit a Post:<br>";
 		foreach ($this->posts as $key => $array) // display links to edit posts
 		{
 			$this->edit_posts_links .= "<a href=\"write?post=".$key."\">{$array['Title']}</a>";
@@ -108,17 +105,7 @@ LONG;
 		?>
 			<html>
 			<head>
-			<style type="text/css">
-			body {font-family: arial; color: #222222; padding: 20px;}
-h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
-                        h1 a{text-decoration:none; color: #0000AA;}
-			/* theme inspired by http://crypto.stanford.edu/~blynn/c/index.html */
-			#sidebar {font-size:.8em;background:#F9F9F9;
-			margin-left: 40px;padding: 8px;}
-			#sidebar a{display: block; padding: 3px;
-			text-decoration:none; color:#0000AA;}
-			#sidebar a:hover {background: #f9f9aa;}
-			</style>
+			<?php head();?>
 			<title><?php echo $title;?></title>
 			<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
 			</head>
@@ -142,7 +129,7 @@ h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
 				</div>
 			</td>
 			</tr></table>
-			<?php blog_analytics();?>
+			<?php footer();?>
 			</body>
 			</html>
 		<?php
@@ -163,6 +150,7 @@ h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
 						?><item>
 						<title><?php echo $post['Title'];?></title>
 						<link><?php echo BLOG_URL . $this->prettyUrl($post['Title']);?></link>
+						<content><?php echo call_user_func($this->format_single_post, $post['Essay']);?></content>
 						</item><?php
 					}
 				?>
@@ -170,6 +158,95 @@ h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
 			</rss>
 		<?php
 	}
+		public function install()
+	{
+		if (file_exists("settings.php") && file_exists("posts.php") && file_exists(".htaccess"))
+		{
+			return 0;
+		}
+		elseif(!isset($_POST['password'])) {
+			file_put_contents("test_file_permissions","");
+			echo (is_writable("test_file_permissions") ? "" : "<span style=\"color:red;\">WARNING! Directory not writeable. Install will fail.</span>");
+			?>
+			<h2>Install brecksblog</h2>
+			<form method="post"><table>
+				<tr><td>Blog Title</td><td><input name="title"></td></tr>
+				<tr><td>Blog Password</td><td><input name="password"></td></tr>
+				<tr><td>Blog Description</td><td><input name="description"></td></tr>
+				<tr><td>Blog Url</td><td><input name="url" value="http://<?php echo $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];?>"></td></tr>
+				<tr><td>Sidebar</td><td><textarea name="sidebar"></textarea></td></tr>
+				<tr><td>Footer</td><td><textarea name="footer"></textarea></td></tr>
+				<tr><td></td><td><input type="submit" value="Finish!"></td></tr>
+			</form>
+			<?php
+			exit;
+		}
+		else {
+		if (!file_exists(".htaccess"))
+		{
+			file_put_contents(".htaccess","RewriteEngine on
+RewriteCond %{HTTP_HOST} ^www\.(.*) [NC]
+RewriteRule ^(.*) http://%1/$1 [R=301,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.*$ index.php?r=%{REQUEST_URI}&%{QUERY_STRING}
+IndexIgnore *");
+		}
+		if (!file_exists("posts.php"))
+		{
+$put = <<<HEREDOC
+<?php \$posts= array (
+  1259736228 => 
+  array (
+    'Title' => 'Hello World',
+    'Essay' => 'Your first blog post!',
+  ),
+)?>
+HEREDOC;
+		file_put_contents("posts.php",$put);
+		}
+		if (!file_exists("settings.php"))
+		{
+$put = <<<HEREDOC
+<?php
+define("BLOG_PASSWORD","{$_POST['password']}");
+define("BLOG_TITLE","{$_POST['title']}");
+define("BLOG_URL","{$_POST['url']}");
+define("BLOG_DESCRIPTION","{$_POST['description']}");
+function head()
+{
+	?>
+	<style type="text/css">
+	body {font-family: arial; color: #222222; padding: 20px;}
+	h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
+	h1 a{text-decoration:none; color: #0000AA;}
+	#sidebar {font-size:.8em;background:#F9F9F9;
+	margin-left: 40px;padding: 8px;}
+	#sidebar a{display: block; padding: 3px;
+	text-decoration:none; color:#0000AA;}
+	#sidebar a:hover {background: #f9f9aa;}
+	</style>
+	<?php
 }
-$blog = new Blog;
+function sidebar()
+{
+	?>
+	<br>
+	{$_POST['sidebar']}
+	<br>
+	<?php
+}
+function footer()
+{
+	?>
+	{$_POST['footer']}
+	<?php
+}
 ?>
+HEREDOC;
+		file_put_contents("settings.php",$put);
+		}
+		}
+	}
+}
+$blog = new Blog; ?>
