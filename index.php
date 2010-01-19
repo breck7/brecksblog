@@ -124,6 +124,7 @@ LONG;
 					}
 					sidebar();
 				?>
+				<br><a href="feed">RSS</a>
 				<br><a href="write" rel="nofollow">Admin</a>
 				<?php echo (isset($this->edit_posts_links) ? $this->edit_posts_links : ""); ?>
 				</div>
