@@ -62,7 +62,7 @@ class Blog {
 		</form>
 LONG;
 		$content = (is_writable("posts.php") ? "" : "<span style=\"color:red;\">WARNING! posts.php not writeable</span>" ) . $content;
-		$this->edit_posts_links = "<br>brecksblog version: {$this->version}<br><br>Edit a Post:<br>";
+		$this->edit_posts_links = "<br>brecksblog version: {$this->version}<br> <form action=\"upgrade\" method=\"post\">Password<input type=\"password\" name=\"password\"><input type=\"submit\" value=\"Upgrade\"></form><br>Edit a Post:<br>";
 		foreach ($this->posts as $key => $array) // display links to edit posts
 		{
 			$this->edit_posts_links .= "<a href=\"write?post=".$key."\">{$array['Title']}</a>";
@@ -78,6 +78,19 @@ LONG;
 			{
 				$this->saveBlog();
 				$this->displayEditor();
+			}
+			elseif ($url == "upgrade") // RSS Feed
+			{
+				if (isset($_POST['password']) && $_POST['password'] == BLOG_PASSWORD)
+				{
+					file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php"));
+					header('Location: write');
+					exit;
+				}
+			}
+			elseif ($url == "json")
+			{
+				echo $_GET['callback'].json_encode($posts);
 			}
 			elseif (isset($this->titles[$url]) ) // Post
 			{
@@ -151,7 +164,7 @@ LONG;
 						?><item>
 						<title><?php echo $post['Title'];?></title>
 						<link><?php echo BLOG_URL . $this->prettyUrl($post['Title']);?></link>
-						<content><?php echo call_user_func($this->format_single_post, $post['Essay']);?></content>
+						<content><?php echo call_user_func($this->format_single_post, str_replace("&","&amp;",strip_tags($post['Essay'])));?></content>
 						</item><?php
 					}
 				?>
