@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.805";
+	var $version = "v0.806";
 	var $format_single_post;
 	public function __construct()
 	{
@@ -20,7 +20,7 @@ class Blog {
 	}
 	public function error($message)
 	{
-		return '<span style="color:red;">$message</span>';
+		return "<span style="color:red;">$message</span>";
 	}
 	public function prettyUrl($title_string) // Turns a "$String' Like THIS" into a string_like_this
 	{
