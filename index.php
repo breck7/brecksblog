@@ -76,33 +76,19 @@ LONG;
 		if (isset($_GET['r']))
 		{
 			$url = array_pop(explode("/",$_GET['r']));  // Get the Redirect Path
-			if ($url == "write") // Editor
+			if ($url == "write"){$this->saveBlog();$this->displayEditor();}
+			elseif ($url == "upgrade" && $this->pw())
 			{
-				$this->saveBlog();
-				$this->displayEditor();
+				file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php")) or die($this->error("File permission problem. Change the file permissions on this directory."));
+				header('Location: write');exit;
 			}
-			elseif ($url == "upgrade")
-			{
-				if ($this->pw())
-				{
-					file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php")) or die($this->error("File permission problem. Change the file permissions on this directory."));
-					header('Location: write');
-					exit;
-				}
-			}
-			elseif ($url == "json")
-			{
-				echo $_GET['callback'].json_encode($this->posts);
-			}
+			elseif ($url == "json"){echo $_GET['callback'].json_encode($this->posts);}
+			elseif ($url == "feed") { $this->displayFeed();}
 			elseif (isset($this->titles[$url]) ) // Post
 			{
 				$post = $this->posts[$this->titles[$url]];
 				$this->displayPage($post['Title'],substr($post['Essay'],0,100),
 				"<h1>{$post['Title']}</h1><div>".call_user_func($this->format_single_post, $post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[$url])."</div>");
-			}
-			elseif ($url == "feed") // RSS Feed
-			{
-				$this->displayFeed();
 			}
 		}
 		else { // Homepage
