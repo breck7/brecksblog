@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.801";
+	var $version = "v0.802";
 	var $format_single_post;
 	public function __construct()
 	{
@@ -65,7 +65,7 @@ class Blog {
 		<tr><td></td><td><input type="submit" value="Save">$delete_button</td></tr></table>
 		</form>
 LONG;
-		$content = (is_writable("posts.php") ? "" : $this->error(WARNING! posts.php not writeable) ) . $content;
+		$content = (is_writable("posts.php") ? "" : $this->error("WARNING! posts.php not writeable") ) . $content;
 		$this->edit_posts_links = "<br>brecksblog version: {$this->version}<br> <form action=\"upgrade\" method=\"post\">Password<input type=\"password\" name=\"password\"><input type=\"submit\" value=\"Upgrade\"></form><br>Edit a Post:<br>";
 		foreach ($this->posts as $key => $array) // display links to edit posts
 		{
