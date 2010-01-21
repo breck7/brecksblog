@@ -167,6 +167,7 @@ LONG;
 				<tr><td></td><td><input type="submit" value="Save"></td></tr></table>
 			</form>
 			<br><br>brecksblog version: <?php echo $this->version;?><br> <form action="upgrade" method="post">Password<input type="password" name="password"><input type="submit" value="Upgrade"></form>
+			<a href="index.php">Back</a>
 			<?php
 	}
 	public function displayFeed()
