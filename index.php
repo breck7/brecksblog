@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.820";
+	var $version = "v0.821";
 	var $format_single_post;
 	public function __construct()
 	{
@@ -29,7 +29,7 @@ class Blog {
 	{
 	if (isset($_POST['password']) && (md5($_POST['password'] . "breckrand") == $this->password)){return true;}
 	echo $this->error("Invalid Password");
-	return false;}
+	exit;}
 	public function prettyUrl($title_string) // Turns a "$String' Like THIS" into a string_like_this
 	{ return strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$title_string)));}
 	public function saveBlog()
@@ -66,22 +66,26 @@ class Blog {
 			$essay_value = $this->posts[$_GET['post']]['Essay'];
 			$delete_button = "<input type=\"submit\" value=\"Delete\" name=\"delete\" onclick=\"return confirm('DELETE. Are you sure?');\">";
 		}
-		$content = <<<LONG
-		<form method="post" action="">
-		<table style="width:100%;">
-		<tr><td>Title</td><td style="width:100%;"><input type="text" name="title" style="width:100%;" value="$title_value"></td></tr>
-		<tr><td>Content</td><td><textarea name="essay" rows="15" style="width:100%;">$essay_value</textarea></td></tr>
+		echo(is_writable("data.php") ? "" : $this->error("WARNING! data.php not writeable") );
+		?><div style="font-family:Arial;"><table style="width:100%;" cellpadding="10px"><tr>
+		<td width="62.5%" valign="top"><form method="post" action=""><table style="width:100%;">
+		<tr><td>Title</td><td style="width:100%;"><input type="text" name="title" style="width:100%;" value="<?=$title_value?>"></td></tr>
+		<tr><td>Content</td><td><textarea name="essay" rows="15" style="width:100%;"><?=$essay_value?></textarea></td></tr>
 		<tr><td>Password</td><td><input type="password" name="password"></td></tr>
-		<tr><td></td><td><input type="submit" value="Save">$delete_button</td></tr></table>
-		</form>
-LONG;
-		$content = (is_writable("data.php") ? "" : $this->error("WARNING! data.php not writeable") ) . $content;
-		$this->edit_posts_links = "<br>Edit a Post:<br>";
-		foreach ($this->posts as $key => $array) // display links to edit posts
-		{
-			$this->edit_posts_links .= "<a href=\"write?post=".$key."\">{$array['Title']}</a>";
-		}
-		$this->displayPage("Editor","Edit your blog",$content);
+		<tr><td></td><td><input type="submit" value="Save"><?=$delete_button?></td></tr></table></form></td>
+		<td style="color:#999999; background: #f9f9f9;">
+		<a href="index.php" style="text-decoration:none;"><?=BLOG_TITLE?></a><br><br>
+		<b>Edit</b><br>
+		<?php foreach ($this->posts as $key => $array) // display links to edit posts
+		{ echo "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";}
+		?><br><br><br><b>Settings</b>
+			<form method="post" action="editsettings">
+				<?php foreach ($this->settings as $key => $value)
+				{?><?php echo ucfirst(strtolower(str_replace("_"," ",$key)));?><br><textarea style="width:100%;" rows="4" name="<?php echo $key;?>"><?php echo $value;?></textarea><br><br><?php }?>
+				Password <input type="password" name="password">
+				<input type="submit" value="Save">
+			</form><br><br><br><b>Upgrade</b>
+			<br>brecksblog version: <?php echo $this->version;?><br> <form action="upgrade" method="post">Password<input type="password" name="password"><input type="submit" value="Upgrade"></form></td></tr></table></div><?php
 	}
 	public function controller() // There are 3 pages: Editor, Post, Homepage+json+rss
 	{
@@ -94,14 +98,12 @@ LONG;
 				file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php")) or die($this->error("File permission problem. Change the file permissions on this directory."));
 				header('Location: write');exit;
 			}
-			elseif ($url == "editsettings" && count($_POST) && $this->pw()){
+			elseif ($url == "editsettings" && $this->pw()){
 				unset($_POST['password']);
 				$this->settings = $_POST;
 				$this->saveData();
 				header("Location: index.php");exit;
 			}
-			elseif ($url == "editsettings")
-			{$this->displaySettingsEditor();}
 			elseif ($url == "json"){echo $_GET['callback'].json_encode($this->posts);}
 			elseif ($url == "feed") { $this->displayFeed();}
 			elseif (isset($this->titles[$url]) ) // Post
@@ -125,18 +127,16 @@ LONG;
 	{
 		?>
 			<html>
-			<head>
-			<?php echo BLOG_HEADER; ?>
-			<title><?php echo $title;?></title>
+			<head><?=BLOG_HEADER?>
+			<title><?=$title?></title>
 			<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
 			</head>
 			<body><table width="100%"><tr>
-			<td valign="top">
-				<?php echo $body; ?>
+			<td valign="top"><?=$body?>
 			</td>
 			<td valign="top" style="width:30%;">
 			<div id="sidebar">
-				<a href="index.php" style="text-decoration:none;"><?php echo BLOG_TITLE;?></a><br><br>
+				<a href="index.php" style="text-decoration:none;"><?=BLOG_TITLE?></a><br><br>
 				<?php 
 					foreach ($this->posts as $post)
 					{
@@ -147,28 +147,13 @@ LONG;
 				?>
 				<br><a href="feed">RSS</a>
 				<br><a href="write" rel="nofollow">Admin</a>
-				<br><a href="editsettings" rel="nofollow">Settings</a>
-				<?php echo (isset($this->edit_posts_links) ? $this->edit_posts_links : ""); ?>
 				</div>
 			</td>
 			</tr></table>
-			<?php echo BLOG_FOOTER; ?>
+			<?=BLOG_FOOTER?>
 			</body>
 			</html>
 		<?php
-	}
-	public function displaySettingsEditor()
-	{
-	?><h2>Blog Settings</h2>
-			<form method="post"><table>
-				<?php foreach ($this->settings as $key => $value)
-				{?><tr><td><?php echo $key;?></td><td><textarea name="<?php echo $key;?>"><?php echo $value;?></textarea></td></tr><?php }?>
-				<tr><td>Password</td><td><input type="password" name="password"></td></tr>
-				<tr><td></td><td><input type="submit" value="Save"></td></tr></table>
-			</form>
-			<br><br>brecksblog version: <?php echo $this->version;?><br> <form action="upgrade" method="post">Password<input type="password" name="password"><input type="submit" value="Upgrade"></form>
-			<a href="index.php">Back</a>
-			<?php
 	}
 	public function displayFeed()
 	{
