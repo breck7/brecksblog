@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.802";
+	var $version = "v0.805";
 	var $format_single_post;
 	public function __construct()
 	{
@@ -94,7 +94,7 @@ LONG;
 			}
 			elseif ($url == "json")
 			{
-				echo $_GET['callback'].json_encode($posts);
+				echo $_GET['callback'].json_encode($this->posts);
 			}
 			elseif (isset($this->titles[$url]) ) // Post
 			{
@@ -168,7 +168,7 @@ LONG;
 						?><item>
 						<title><?php echo $post['Title'];?></title>
 						<link><?php echo BLOG_URL . $this->prettyUrl($post['Title']);?></link>
-						<content><?php echo call_user_func($this->format_single_post, str_replace("&","&amp;",strip_tags($post['Essay'])));?></content>
+						<description><?php echo call_user_func($this->format_single_post, str_replace("&","&amp;",strip_tags($post['Essay'])));?></description>
 						</item><?php
 					}
 				?>
