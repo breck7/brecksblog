@@ -160,12 +160,10 @@ LONG;
 			</rss>
 		<?php
 	}
-		public function install()
+	public function install() // BEGIN INSTALLER
 	{
-		if (file_exists("settings.php") && file_exists("posts.php") && file_exists(".htaccess"))
-		{
-			return 0;
-		}
+		if (file_exists("settings.php") || file_exists("posts.php") || file_exists(".htaccess"))
+		{ return false; } // dont overwrite these things
 		elseif(!isset($_POST['password'])) {
 			file_put_contents("test_file_permissions","");
 			echo (is_writable("test_file_permissions") ? "" : $this->error("WARNING! Directory not writeable. Install will fail."));
@@ -184,18 +182,13 @@ LONG;
 			exit;
 		}
 		else {
-		if (!file_exists(".htaccess"))
-		{
-			file_put_contents(".htaccess","RewriteEngine on
+		file_put_contents(".htaccess","RewriteEngine on
 RewriteCond %{HTTP_HOST} ^www\.(.*) [NC]
 RewriteRule ^(.*) http://%1/$1 [R=301,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^.*$ index.php?r=%{REQUEST_URI}&%{QUERY_STRING}
 IndexIgnore *");
-		}
-		if (!file_exists("posts.php"))
-		{
 $put = <<<HEREDOC
 <?php \$posts= array (
   1259736228 => 
@@ -206,9 +199,6 @@ $put = <<<HEREDOC
 )?>
 HEREDOC;
 		file_put_contents("posts.php",$put);
-		}
-		if (!file_exists("settings.php"))
-		{
 $put = <<<HEREDOC
 <?php
 define("BLOG_PASSWORD","{$_POST['password']}");
@@ -248,7 +238,6 @@ function footer()
 HEREDOC;
 		file_put_contents("settings.php",$put);
 		}
-		}
-	}
+	} // END INSTALLER
 }
 $blog = new Blog; ?>
