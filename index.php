@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.806";
+	var $version = "v0.810";
 	var $format_single_post;
 	public function __construct()
 	{
@@ -19,7 +19,7 @@ class Blog {
 		$this->controller();
 	}
 	public function error($message)
-	{ return "<span style="color:red;">$message</span>";}
+	{ return "<span style=\"color:red;\">$message</span>";}
 	public function pw() // returns true if correct password
 	{ return isset($_POST['password']) && $_POST['password'] == BLOG_PASSWORD;}
 	public function prettyUrl($title_string) // Turns a "$String' Like THIS" into a string_like_this
@@ -106,7 +106,7 @@ LONG;
 		?>
 			<html>
 			<head>
-			<?php head();?>
+			<?php echo BLOG_HEADER; ?>
 			<title><?php echo $title;?></title>
 			<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
 			</head>
@@ -123,7 +123,7 @@ LONG;
 						?><a href="<?php echo $this->prettyUrl($post['Title']);?>">
 						<?php echo $post['Title'];?></a><?php
 					}
-					sidebar();
+					echo BLOG_SIDEBAR; 
 				?>
 				<br><a href="feed">RSS</a>
 				<br><a href="write" rel="nofollow">Admin</a>
@@ -131,7 +131,7 @@ LONG;
 				</div>
 			</td>
 			</tr></table>
-			<?php footer();?>
+			<?php echo BLOG_FOOTER; ?>
 			</body>
 			</html>
 		<?php
@@ -174,6 +174,16 @@ LONG;
 				<tr><td>Blog Password</td><td><input name="password"></td></tr>
 				<tr><td>Blog Description</td><td><input name="description"></td></tr>
 				<tr><td>Blog Url</td><td><input name="url" value="http://<?php echo $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];?>"></td></tr>
+				<tr><td>Header</td><td><textarea name="header">&lt;style type="text/css"&gt;
+body {font-family: arial; color: #222222; padding: 20px;}
+h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
+h1 a{text-decoration:none; color: #0000AA;}
+#sidebar {font-size:.8em;background:#F9F9F9;
+margin-left: 40px;padding: 8px;}
+#sidebar a{display: block; padding: 3px;
+text-decoration:none; color:#0000AA;}
+#sidebar a:hover {background: #f9f9aa;}
+&lt;/style&gt;</textarea></td></tr>
 				<tr><td>Sidebar</td><td><textarea name="sidebar"></textarea></td></tr>
 				<tr><td>Footer</td><td><textarea name="footer"></textarea></td></tr>
 				<tr><td></td><td><input type="submit" value="Finish!"></td></tr>
@@ -199,43 +209,15 @@ $put = <<<HEREDOC
 )?>
 HEREDOC;
 		file_put_contents("posts.php",$put);
-$put = <<<HEREDOC
-<?php
-define("BLOG_PASSWORD","{$_POST['password']}");
-define("BLOG_TITLE","{$_POST['title']}");
-define("BLOG_URL","{$_POST['url']}");
-define("BLOG_DESCRIPTION","{$_POST['description']}");
-function head()
-{
-	?>
-	<style type="text/css">
-	body {font-family: arial; color: #222222; padding: 20px;}
-	h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
-	h1 a{text-decoration:none; color: #0000AA;}
-	#sidebar {font-size:.8em;background:#F9F9F9;
-	margin-left: 40px;padding: 8px;}
-	#sidebar a{display: block; padding: 3px;
-	text-decoration:none; color:#0000AA;}
-	#sidebar a:hover {background: #f9f9aa;}
-	</style>
-	<?php
-}
-function sidebar()
-{
-	?>
-	<br>
-	{$_POST['sidebar']}
-	<br>
-	<?php
-}
-function footer()
-{
-	?>
-	{$_POST['footer']}
-	<?php
-}
-?>
-HEREDOC;
+$put = "<?php
+define('BLOG_PASSWORD','".str_replace("'","\'",$_POST['password'])."');
+define('BLOG_TITLE','".str_replace("'","\'",$_POST['title'])."');
+define('BLOG_URL','".str_replace("'","\'",$_POST['url'])."');
+define('BLOG_DESCRIPTION','".str_replace("'","\'",$_POST['description'])."');
+define('BLOG_SIDEBAR','".str_replace("'","\'",$_POST['sidebar'])."');
+define('BLOG_FOOTER','".str_replace("'","\'",$_POST['footer'])."');
+define('BLOG_HEADER','".str_replace("'","\'",$_POST['header'])."');
+?>";
 		file_put_contents("settings.php",$put);
 		}
 	} // END INSTALLER
