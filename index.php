@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.8";
+	var $version = "v0.801";
 	var $format_single_post;
 	public function __construct()
 	{
@@ -17,6 +17,10 @@ class Blog {
 			$this->titles[$this->prettyUrl($array['Title'])] = $key;
 		}
 		$this->controller();
+	}
+	public function error($message)
+	{
+		return '<span style="color:red;">$message</span>';
 	}
 	public function prettyUrl($title_string) // Turns a "$String' Like THIS" into a string_like_this
 	{
@@ -44,7 +48,7 @@ class Blog {
 	}
 	public function displayEditor ()
 	{
-		$invalid = (isset($_POST['password']) && $_POST['password'] != BLOG_PASSWORD ? ' <span style="color:red;">Invalid Password</span>' : "");
+		$invalid = (isset($_POST['password']) && $_POST['password'] != BLOG_PASSWORD ? $this->error('Invalid Password') : "");
 		$title_value = ""; $essay_value = ""; $delete_button = "";
 		if (isset($_GET['post']) && isset($this->posts[$_GET['post']]))
 		{
@@ -61,7 +65,7 @@ class Blog {
 		<tr><td></td><td><input type="submit" value="Save">$delete_button</td></tr></table>
 		</form>
 LONG;
-		$content = (is_writable("posts.php") ? "" : "<span style=\"color:red;\">WARNING! posts.php not writeable</span>" ) . $content;
+		$content = (is_writable("posts.php") ? "" : $this->error(WARNING! posts.php not writeable) ) . $content;
 		$this->edit_posts_links = "<br>brecksblog version: {$this->version}<br> <form action=\"upgrade\" method=\"post\">Password<input type=\"password\" name=\"password\"><input type=\"submit\" value=\"Upgrade\"></form><br>Edit a Post:<br>";
 		foreach ($this->posts as $key => $array) // display links to edit posts
 		{
@@ -79,11 +83,11 @@ LONG;
 				$this->saveBlog();
 				$this->displayEditor();
 			}
-			elseif ($url == "upgrade") // RSS Feed
+			elseif ($url == "upgrade")
 			{
 				if (isset($_POST['password']) && $_POST['password'] == BLOG_PASSWORD)
 				{
-					file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php"));
+					file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php")) or die($this->error("File permission problem. Change the file permissions on this directory."));
 					header('Location: write');
 					exit;
 				}
@@ -180,7 +184,7 @@ LONG;
 		}
 		elseif(!isset($_POST['password'])) {
 			file_put_contents("test_file_permissions","");
-			echo (is_writable("test_file_permissions") ? "" : "<span style=\"color:red;\">WARNING! Directory not writeable. Install will fail.</span>");
+			echo (is_writable("test_file_permissions") ? "" : $this->error("WARNING! Directory not writeable. Install will fail."));
 			?>
 			<h2>Install brecksblog</h2>
 			<form method="post"><table>
