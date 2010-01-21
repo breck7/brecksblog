@@ -19,16 +19,14 @@ class Blog {
 		$this->controller();
 	}
 	public function error($message)
-	{
-		return "<span style="color:red;">$message</span>";
-	}
+	{ return "<span style="color:red;">$message</span>";}
+	public function pw() // returns true if correct password
+	{ return isset($_POST['password']) && $_POST['password'] == BLOG_PASSWORD;}
 	public function prettyUrl($title_string) // Turns a "$String' Like THIS" into a string_like_this
-	{
-		return strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$title_string)));
-	}
+	{ return strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$title_string)));}
 	public function saveBlog()
 	{
-		if (isset($_POST['password']) && $_POST['password'] == BLOG_PASSWORD)
+		if ($this->pw())
 		{
 			if (!isset($_GET['post'])) // create new post
 			{
@@ -48,7 +46,7 @@ class Blog {
 	}
 	public function displayEditor ()
 	{
-		$invalid = (isset($_POST['password']) && $_POST['password'] != BLOG_PASSWORD ? $this->error('Invalid Password') : "");
+		$invalid = ($this->pw() ? $this->error('Invalid Password') : "");
 		$title_value = ""; $essay_value = ""; $delete_button = "";
 		if (isset($_GET['post']) && isset($this->posts[$_GET['post']]))
 		{
@@ -85,7 +83,7 @@ LONG;
 			}
 			elseif ($url == "upgrade")
 			{
-				if (isset($_POST['password']) && $_POST['password'] == BLOG_PASSWORD)
+				if ($this->pw())
 				{
 					file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php")) or die($this->error("File permission problem. Change the file permissions on this directory."));
 					header('Location: write');
