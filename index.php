@@ -1,10 +1,10 @@
 <?php
 class Blog {
-	var $version = "v0.830";
+	var $version = "v0.831";
 	var $format_single_post;
+	
 	public function __construct()
-	{
-		$this->install();
+	{	$this->install();
 		$this->format_single_post = 'nl2br'; // default format func
 		if (file_exists("markdown.php")) {
 			include_once("markdown.php"); $this->format_single_post = 'Markdown';
@@ -21,20 +21,20 @@ class Blog {
 		{
 			$this->titles[$this->prettyUrl($array['Title'])] = $key;
 		}
-		$this->controller();
-	}
+		$this->controller();}
+	
 	public function error($message)
-	{ return "<span style=\"color:red;\">$message</span>";}
+	{	return "<span style=\"color:red;\">$message</span>";exit;}
+	
 	public function pw() // returns true if correct password
-	{
-	if (isset($_POST['password']) && (md5($_POST['password'] . "breckrand") == $this->password)){return true;}
-	echo $this->error("Invalid Password");
-	exit;}
-	public function prettyUrl($title_string) // Turns a "$String' Like THIS" into a string_like_this
-	{ return strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$title_string)));}
+	{	if (isset($_POST['password']) && (md5($_POST['password'] . "breckrand") == $this->password)){return true;}
+		echo $this->error("Invalid Password");}
+	
+	public function prettyUrl($title_string) // cleans a string
+	{	return strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$title_string)));}
+	
 	public function saveBlog()
-	{
-		if (count($_POST) && $this->pw())
+	{	if (count($_POST) && $this->pw())
 		{
 			if (!isset($_GET['post'])) // create new post
 			{
@@ -51,15 +51,15 @@ class Blog {
 			krsort($this->posts); // Sort the posts in reverse chronological order
 			$this->saveData();
 		}
-	}
+		}
+
 	public function saveData()
-	{
-		$data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password);
+	{	$data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password);
 		file_put_contents("data.php", "<?php \$data= ".var_export($data, true) . "?>");
-	}
+		}
+
 	public function displayEditor ()
-	{
-		$title_value = ""; $essay_value = ""; $delete_button = "";
+	{	$title_value = ""; $essay_value = ""; $delete_button = "";
 		if (isset($_GET['post']) && isset($this->posts[$_GET['post']]))
 		{
 			$title_value = $this->posts[$_GET['post']]['Title'];
@@ -89,10 +89,10 @@ class Blog {
 				<input type="submit" value="Save">
 			</form><br><br><br><b>Upgrade</b>
 			<br>brecksblog version: <?php echo $this->version;?><br> <form action="upgrade" method="post">Password<input type="password" name="password"><input type="submit" value="Upgrade"></form></td></tr></table></div><?php
-	}
+		}
+	
 	public function controller() // There are 3 pages: Editor, Post, Homepage+json+rss
-	{
-		if (isset($_GET['r']))
+	{	if (isset($_GET['r']))
 		{
 			$url = array_pop(explode("/",$_GET['r']));  // Get the Redirect Path
 			if ($url == "write"){$this->saveBlog();$this->displayEditor();}
@@ -102,6 +102,10 @@ class Blog {
 				header('Location: write');exit;
 			}
 			elseif ($url == "upload" && $this->pw()){
+				if (!preg_match('/(gif|jpeg|jpg|png|mov|avi|xls|doc|pdf|txt|html|htm|css|js)/i',end(explode('.', $_FILES["file"]["name"]))))
+				{
+					echo $this->error("You can't upload that type of file."); exit;
+				}
 				move_uploaded_file($_FILES["file"]["tmp_name"],$_FILES["file"]["name"]);
 				echo "File saved as <a target=\"_blank\" href=\"{$_FILES["file"]["name"]}\">{$_FILES["file"]["name"]}</a>";
 				$this->displayEditor();
@@ -120,6 +124,9 @@ class Blog {
 				$this->displayPage($post['Title'],substr($post['Essay'],0,100),
 				"<h1>{$post['Title']}</h1><div>".call_user_func($this->format_single_post, $post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[$url])."</div>");
 			}
+			else {
+				?>Oops! File not found. <a href="<?=BLOG_URL?>">Back to blog</a>.<?php
+			}
 		}
 		else { // Homepage
 			$all_posts = ""; // Might want to limit it to most recent 5 or so posts.
@@ -130,11 +137,10 @@ class Blog {
 			$this->displayPage(BLOG_TITLE, BLOG_DESCRIPTION,
 			$all_posts); 
 		}
-	}
+		}
+	
 	public function displayPage($title, $description, $body)
-	{
-		?>
-			<html>
+	{	?><html>
 			<head><?=BLOG_HEADER?>
 			<title><?=$title?></title>
 			<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
@@ -156,11 +162,10 @@ class Blog {
 			<div id="footer"><?=BLOG_FOOTER?></div>
 			</body>
 			</html>
-		<?php
-	}
+	<?php }
+	
 	public function displayFeed()
-	{
-		header('Content-Type: text/xml');
+	{	header('Content-Type: text/xml');
 		?><?php echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';?>
 			<rss version="0.91">
 			<channel>
@@ -180,11 +185,10 @@ class Blog {
 				?>
 			</channel>
 			</rss>
-		<?php
-	}
+		<?php }
+	
 	public function install()
-	{
-		if (file_exists("data.php") || file_exists(".htaccess"))
+	{	if (file_exists("data.php") || file_exists(".htaccess"))
 		{ return false; } // dont overwrite these things
 		elseif(!isset($_POST['password'])) {
 		file_put_contents("test_file_permissions","");
@@ -225,6 +229,6 @@ h1 a{text-decoration:none; color: #0000AA;}
 		'Essay' => 'Your first blog post!'));
 		$this->saveData();
 		}
-	}
+		}
 }
 $blog = new Blog; ?>
