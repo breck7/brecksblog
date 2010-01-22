@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.821";
+	var $version = "v0.822";
 	var $format_single_post;
 	public function __construct()
 	{
@@ -131,26 +131,21 @@ class Blog {
 			<title><?=$title?></title>
 			<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
 			</head>
-			<body><table width="100%"><tr>
-			<td valign="top"><?=$body?>
-			</td>
-			<td valign="top" style="width:30%;">
-			<div id="sidebar">
-				<a href="index.php" style="text-decoration:none;"><?=BLOG_TITLE?></a><br><br>
+			<body>
+			<div id="content"><?=$body?></div>
+			<div id="navigation">
+				<b><a href="index.php" style="text-decoration:none;"><?=BLOG_TITLE?></a></b><br><br>
 				<?php 
 					foreach ($this->posts as $post)
 					{
 						?><a href="<?php echo $this->prettyUrl($post['Title']);?>">
 						<?php echo $post['Title'];?></a><?php
-					}
-					echo BLOG_SIDEBAR; 
-				?>
+					} 
+				?><br><?=BLOG_NAVIGATION?>
 				<br><a href="feed">RSS</a>
-				<br><a href="write" rel="nofollow">Admin</a>
-				</div>
-			</td>
-			</tr></table>
-			<?=BLOG_FOOTER?>
+				<a href="write" rel="nofollow">Admin</a>
+			</div>
+			<div id="footer"><?=BLOG_FOOTER?></div>
 			</body>
 			</html>
 		<?php
@@ -207,17 +202,16 @@ IndexIgnore *");
 		$this->settings = array("BLOG_TITLE" => "My blog",
 		"BLOG_DESCRIPTION"=>"A blog experiment.",
 		"BLOG_URL"=> "http://".$_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
-		"BLOG_SIDEBAR"=>"",
+		"BLOG_NAVIGATION"=>"",
 		"BLOG_FOOTER"=>"",
 		"BLOG_HEADER"=>"<style type=\"text/css\">
 body {font-family: arial; color: #222222; padding: 20px;}
 h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
 h1 a{text-decoration:none; color: #0000AA;}
-#sidebar {font-size:.8em;background:#F9F9F9;
-margin-left: 40px;padding: 8px;}
-#sidebar a{display: block; padding: 3px;
-text-decoration:none; color:#0000AA;}
-#sidebar a:hover {background: #f9f9aa;}
+#content {float:left; width:70%;margin-right:10px;}
+#navigation {font-size:.8em;background:#F9F9F9; float:left; width:25%;padding: 8px;}
+#navigation a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
+#navigation a:hover {background: #f9f9aa;}
 </style>");
 		$this->posts = array(1259736228=>array('Title' => 'Hello World',
 		'Essay' => 'Your first blog post!'));
