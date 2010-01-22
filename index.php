@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.822";
+	var $version = "v0.830";
 	var $format_single_post;
 	public function __construct()
 	{
