@@ -78,7 +78,10 @@ class Blog {
 		<b>Edit</b><br>
 		<?php foreach ($this->posts as $key => $array) // display links to edit posts
 		{ echo "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";}
-		?><br><br><br><b>Settings</b>
+		?><br><br><br><b>Upload File</b>
+		<form action="upload" method="post" enctype="multipart/form-data"><input type="file" name="file"><br>Password <input type="password" name="password">
+		<input type="submit" value="Upload"></form>
+		<br><br><br><b>Settings</b>
 			<form method="post" action="editsettings">
 				<?php foreach ($this->settings as $key => $value)
 				{?><?php echo ucfirst(strtolower(str_replace("_"," ",$key)));?><br><textarea style="width:100%;" rows="4" name="<?php echo $key;?>"><?php echo $value;?></textarea><br><br><?php }?>
@@ -97,6 +100,11 @@ class Blog {
 			{
 				file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php")) or die($this->error("File permission problem. Change the file permissions on this directory."));
 				header('Location: write');exit;
+			}
+			elseif ($url == "upload" && $this->pw()){
+				move_uploaded_file($_FILES["file"]["tmp_name"],$_FILES["file"]["name"]);
+				echo "File saved as <a target=\"_blank\" href=\"{$_FILES["file"]["name"]}\">{$_FILES["file"]["name"]}</a>";
+				$this->displayEditor();
 			}
 			elseif ($url == "editsettings" && $this->pw()){
 				unset($_POST['password']);
