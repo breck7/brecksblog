@@ -1,10 +1,25 @@
 <?php
 class Blog {
-	var $version = "v0.832";
+	var $version = "v0.834";
 	var $format_single_post;
 	
 	public function __construct()
-	{	$this->install();
+	{	// set default settings
+		$this->settings = array("BLOG_TITLE" => "My blog",
+		"BLOG_DESCRIPTION"=>"A blog experiment.",
+		"BLOG_URL"=> "http://".$_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
+		"BLOG_NAVIGATION"=>"",
+		"BLOG_FOOTER"=>"",
+		"BLOG_HEADER"=>"<style type=\"text/css\">
+		body {font-family: arial; color: #222222; padding: 20px;}
+		h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
+		h1 a{text-decoration:none; color: #0000AA;}
+		#content {float:left; width:70%;margin-right:10px;}
+		#navigation {font-size:.8em;background:#F9F9F9; float:left; width:25%;padding: 8px;}
+		#navigation a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
+		#navigation a:hover {background: #f9f9aa;}
+		</style>");
+		$this->install();
 		$this->format_single_post = 'nl2br'; // default format func
 		if (file_exists("markdown.php")) {
 			include_once("markdown.php"); $this->format_single_post = 'Markdown';
@@ -21,14 +36,14 @@ class Blog {
 		{
 			$this->titles[$this->prettyUrl($array['Title'])] = $key;
 		}
-		$this->controller();}
+		$this->controller();
+	}
 	
 	public function error($message)
-	{	return "<span style=\"color:red;\">$message</span>";exit;}
+	{	echo "<span style=\"color:red;\">$message</span>";exit;}
 	
 	public function pw() // returns true if correct password
-	{	if (isset($_POST['password']) && (md5($_POST['password'] . "breckrand") == $this->password)){return true;}
-		echo $this->error("Invalid Password");}
+	{	if (isset($_POST['password']) && (md5($_POST['password'] . "breckrand") == $this->password)){return true;} $this->error("Invalid Password");}
 	
 	public function prettyUrl($title_string) // cleans a string
 	{	return strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$title_string)));}
@@ -37,26 +52,30 @@ class Blog {
 	{	if (count($_POST) && $this->pw())
 		{
 			if (!isset($_GET['post'])) // create new post
-			{
-				$this->posts[time()] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
+			{	$time = time();
+				if (strlen($_POST['title']) < 1){$this->error("Title can't be blank");}
+				$this->posts[$time] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
+				echo "<a href=\"".$this->prettyUrl($_POST['title'])."\">Post created!</a> | <a href=\"write?post={$time}\">Edit it</a>";
 			}
 			elseif (isset($this->posts[$_GET['post']]) && isset($_POST['delete'])) // delete a post
 			{
 				unset($this->posts[$_GET['post']]);
+				echo "Post deleted.";
 			}
 			elseif (isset($this->posts[$_GET['post']])) // edit a post
 			{
 				$this->posts[$_GET['post']] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
+				echo "<a href=\"".$this->prettyUrl($_POST['title'])."\">Post updated!</a>";
 			}
 			krsort($this->posts); // Sort the posts in reverse chronological order
 			$this->saveData();
 		}
-		}
+	}
 
 	public function saveData()
 	{	$data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password);
 		file_put_contents("data.php", "<?php \$data= ".var_export($data, true) . "?>");
-		}
+	}
 
 	public function displayEditor ()
 	{	$title_value = ""; $essay_value = ""; $delete_button = "";
@@ -64,9 +83,9 @@ class Blog {
 		{
 			$title_value = $this->posts[$_GET['post']]['Title'];
 			$essay_value = $this->posts[$_GET['post']]['Essay'];
-			$delete_button = "<input type=\"submit\" value=\"Delete\" name=\"delete\" onclick=\"return confirm('DELETE. Are you sure?');\">";
+			$delete_button = "<input type=\"submit\" value=\"Delete\" name=\"delete\" onclick=\"return confirm('DELETE. Are you sure?');\"><br><br><a href=\"write\">Create new post</a>";
 		}
-		echo(is_writable("data.php") ? "" : $this->error("WARNING! data.php not writeable") );
+		(is_writable("data.php") ? "" : $this->error("WARNING! data.php not writeable") );
 		?><div style="font-family:Arial;"><table style="width:100%;" cellpadding="10px"><tr>
 		<td width="62.5%" valign="top"><form method="post" action=""><table style="width:100%;">
 		<tr><td>Title</td><td style="width:100%;"><input type="text" name="title" style="width:100%;" value="<?=$title_value?>"></td></tr>
@@ -89,22 +108,22 @@ class Blog {
 				<input type="submit" value="Save">
 			</form><br><br><br><b>Upgrade</b>
 			<br>brecksblog version: <?php echo $this->version;?><br> <form action="upgrade" method="post">Password<input type="password" name="password"><input type="submit" value="Upgrade"></form></td></tr></table></div><?php
-		}
+	}
 	
-	public function controller() // There are 3 pages: Editor, Post, Homepage+json+rss
+	public function controller()
 	{	if (isset($_GET['r']))
 		{
 			$url = array_pop(explode("/",$_GET['r']));  // Get the Redirect Path
 			if ($url == "write"){$this->saveBlog();$this->displayEditor();}
 			elseif ($url == "upgrade" && $this->pw())
 			{
-				file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php")) or die($this->error("File permission problem. Change the file permissions on this directory."));
+				file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php")) or $this->error("File permission problem. Change the file permissions on this directory.");
 				header('Location: write');exit;
 			}
 			elseif ($url == "upload" && $this->pw()){
 				if (!preg_match('/(gif|jpeg|jpg|png|mov|avi|xls|doc|pdf|txt|html|htm|css|js)/i',end(explode('.', $_FILES["file"]["name"]))))
 				{
-					echo $this->error("You can't upload that type of file."); exit;
+					$this->error("You can't upload that type of file."); exit;
 				}
 				move_uploaded_file($_FILES["file"]["tmp_name"],$_FILES["file"]["name"]);
 				echo "File saved as <a target=\"_blank\" href=\"{$_FILES["file"]["name"]}\">{$_FILES["file"]["name"]}</a>";
@@ -137,7 +156,7 @@ class Blog {
 			$this->displayPage(BLOG_TITLE, BLOG_DESCRIPTION,
 			$all_posts); 
 		}
-		}
+	}
 	
 	public function displayPage($title, $description, $body)
 	{	?><html>
@@ -149,7 +168,7 @@ class Blog {
 			<div id="content"><?=$body?></div>
 			<div id="navigation">
 				<b><a href="index.php" style="text-decoration:none;"><?=BLOG_TITLE?></a></b><br><?=BLOG_NAVIGATION?>
-				<br>
+				<br>Posts:
 				<?php 
 					foreach ($this->posts as $post)
 					{
@@ -162,8 +181,8 @@ class Blog {
 			</div>
 			<div id="footer"><?=BLOG_FOOTER?></div>
 			</body>
-			</html>
-	<?php }
+			</html><?php 
+	}
 	
 	public function displayFeed()
 	{	header('Content-Type: text/xml');
@@ -186,22 +205,18 @@ class Blog {
 				?>
 			</channel>
 			</rss>
-		<?php }
+		<?php 
+	}
 	
 	public function install()
 	{	if (file_exists("data.php") || file_exists(".htaccess"))
 		{ return false; } // dont overwrite these things
-		elseif(!isset($_POST['password'])) {
-		file_put_contents("test_file_permissions","");
-		echo (is_writable("test_file_permissions") ? "" : $this->error("WARNING! Directory not writeable. Install will fail."));
-		?>
-		<h2>Install brecksblog</h2>
-		<form method="post">
-		Choose a Password <input name="password" type="password">
-		<input type="submit" value="Install!">
-		</form>
-		<?php
-		exit;
+		elseif(!isset($_POST['password'])) 
+		{
+			file_put_contents("test_file_permissions","1") or $this->error("WARNING! Directory not writeable. Change the file permissions before installing."); unlink("test_file_permissions",""); ?>
+			<h2>Install brecksblog</h2>
+			<form method="post">Choose a Password <input name="password" type="password"><input type="submit" value="Install!"></form>
+			<?php exit;
 		}
 		else {
 		file_put_contents(".htaccess","RewriteEngine on
@@ -212,24 +227,10 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^.*$ index.php?r=%{REQUEST_URI}&%{QUERY_STRING}
 IndexIgnore *");
 		$this->password = md5($_POST['password'] . "breckrand");
-		$this->settings = array("BLOG_TITLE" => "My blog",
-		"BLOG_DESCRIPTION"=>"A blog experiment.",
-		"BLOG_URL"=> "http://".$_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
-		"BLOG_NAVIGATION"=>"",
-		"BLOG_FOOTER"=>"",
-		"BLOG_HEADER"=>"<style type=\"text/css\">
-body {font-family: arial; color: #222222; padding: 20px;}
-h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
-h1 a{text-decoration:none; color: #0000AA;}
-#content {float:left; width:70%;margin-right:10px;}
-#navigation {font-size:.8em;background:#F9F9F9; float:left; width:25%;padding: 8px;}
-#navigation a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
-#navigation a:hover {background: #f9f9aa;}
-</style>");
 		$this->posts = array(1259736228=>array('Title' => 'Hello World',
 		'Essay' => 'Your first blog post!'));
 		$this->saveData();
 		}
-		}
+	}
 }
 $blog = new Blog; ?>
