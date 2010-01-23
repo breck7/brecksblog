@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.831";
+	var $version = "v0.832";
 	var $format_single_post;
 	
 	public function __construct()
@@ -148,14 +148,15 @@ class Blog {
 			<body>
 			<div id="content"><?=$body?></div>
 			<div id="navigation">
-				<b><a href="index.php" style="text-decoration:none;"><?=BLOG_TITLE?></a></b><br><br>
+				<b><a href="index.php" style="text-decoration:none;"><?=BLOG_TITLE?></a></b><br><?=BLOG_NAVIGATION?>
+				<br>
 				<?php 
 					foreach ($this->posts as $post)
 					{
 						?><a href="<?php echo $this->prettyUrl($post['Title']);?>">
 						<?php echo $post['Title'];?></a><?php
 					} 
-				?><br><?=BLOG_NAVIGATION?>
+				?>
 				<br><a href="feed">RSS</a>
 				<a href="write" rel="nofollow">Admin</a>
 			</div>
