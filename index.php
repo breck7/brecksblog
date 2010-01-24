@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.834";
+	var $version = "v0.837";
 	var $format_single_post;
 	
 	public function __construct()
@@ -42,6 +42,9 @@ class Blog {
 	public function error($message)
 	{	echo "<span style=\"color:red;\">$message</span>";exit;}
 	
+	public function success($message)
+	{	echo "<span style=\"color:green;\">$message</span>";}
+	
 	public function pw() // returns true if correct password
 	{	if (isset($_POST['password']) && (md5($_POST['password'] . "breckrand") == $this->password)){return true;} $this->error("Invalid Password");}
 	
@@ -55,17 +58,17 @@ class Blog {
 			{	$time = time();
 				if (strlen($_POST['title']) < 1){$this->error("Title can't be blank");}
 				$this->posts[$time] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
-				echo "<a href=\"".$this->prettyUrl($_POST['title'])."\">Post created!</a> | <a href=\"write?post={$time}\">Edit it</a>";
+				$this->success("<a href=\"".$this->prettyUrl($_POST['title'])."\">Post created!</a> | <a href=\"write?post={$time}\">Edit it</a>");
 			}
 			elseif (isset($this->posts[$_GET['post']]) && isset($_POST['delete'])) // delete a post
 			{
 				unset($this->posts[$_GET['post']]);
-				echo "Post deleted.";
+				$this->success("Post deleted.");
 			}
 			elseif (isset($this->posts[$_GET['post']])) // edit a post
 			{
 				$this->posts[$_GET['post']] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
-				echo "<a href=\"".$this->prettyUrl($_POST['title'])."\">Post updated!</a>";
+				$this->success("<a href=\"".$this->prettyUrl($_POST['title'])."\">Post updated!</a>");
 			}
 			krsort($this->posts); // Sort the posts in reverse chronological order
 			$this->saveData();
@@ -98,16 +101,16 @@ class Blog {
 		<?php foreach ($this->posts as $key => $array) // display links to edit posts
 		{ echo "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";}
 		?><br><br><br><b>Upload File</b>
-		<form action="upload" method="post" enctype="multipart/form-data"><input type="file" name="file"><br>Password <input type="password" name="password">
+		<form action="upload" method="post" enctype="multipart/form-data"><input type="file" name="file"><br>Password<br><input type="password" name="password">
 		<input type="submit" value="Upload"></form>
 		<br><br><br><b>Settings</b>
 			<form method="post" action="editsettings">
 				<?php foreach ($this->settings as $key => $value)
 				{?><?php echo ucfirst(strtolower(str_replace("_"," ",$key)));?><br><textarea style="width:100%;" rows="4" name="<?php echo $key;?>"><?php echo $value;?></textarea><br><br><?php }?>
-				Password <input type="password" name="password">
+				Password<br><input type="password" name="password">
 				<input type="submit" value="Save">
 			</form><br><br><br><b>Upgrade</b>
-			<br>brecksblog version: <?php echo $this->version;?><br> <form action="upgrade" method="post">Password<input type="password" name="password"><input type="submit" value="Upgrade"></form></td></tr></table></div><?php
+			<br>brecksblog version: <?php echo $this->version;?><br> <form action="upgrade" method="post">Password<br><input type="password" name="password"><input type="submit" value="Upgrade"></form></td></tr></table></div><?php
 	}
 	
 	public function controller()
@@ -118,7 +121,7 @@ class Blog {
 			elseif ($url == "upgrade" && $this->pw())
 			{
 				file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php")) or $this->error("File permission problem. Change the file permissions on this directory.");
-				header('Location: write');exit;
+				$this->success("Blog updated! <a href=\"write\">Admin</a>");exit;
 			}
 			elseif ($url == "upload" && $this->pw()){
 				if (!preg_match('/(gif|jpeg|jpg|png|mov|avi|xls|doc|pdf|txt|html|htm|css|js)/i',end(explode('.', $_FILES["file"]["name"]))))
@@ -126,14 +129,15 @@ class Blog {
 					$this->error("You can't upload that type of file."); exit;
 				}
 				move_uploaded_file($_FILES["file"]["tmp_name"],$_FILES["file"]["name"]);
-				echo "File saved as <a target=\"_blank\" href=\"{$_FILES["file"]["name"]}\">{$_FILES["file"]["name"]}</a>";
+				$this->success("File <a target=\"_blank\" href=\"{$_FILES["file"]["name"]}\">saved</a> as {$_FILES["file"]["name"]}");
 				$this->displayEditor();
 			}
 			elseif ($url == "editsettings" && $this->pw()){
 				unset($_POST['password']);
 				$this->settings = $_POST;
 				$this->saveData();
-				header("Location: index.php");exit;
+				$this->success("Settings saved.");
+				$this->displayEditor();
 			}
 			elseif ($url == "json"){echo $_GET['callback'].json_encode($this->posts);}
 			elseif ($url == "feed") { $this->displayFeed();}
@@ -144,14 +148,14 @@ class Blog {
 				"<h1>{$post['Title']}</h1><div>".call_user_func($this->format_single_post, $post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[$url])."</div>");
 			}
 			else {
-				?>Oops! File not found. <a href="<?=BLOG_URL?>">Back to blog</a>.<?php
+				?>Oops! File not found. <a href="index.php">Back to blog</a>.<?php
 			}
 		}
 		else { // Homepage
 			$all_posts = ""; // Might want to limit it to most recent 5 or so posts.
 			foreach ($this->posts as $key => $post)
 			{
-				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".call_user_func($this->format_single_post, $post['Essay'])."<br><br>Posted ".date("m/d/Y", $key )."</div><br><br>";
+				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".call_user_func($this->format_single_post, substr(strip_tags($post['Essay']),0,150))."<a href=\"".$this->prettyUrl($post['Title'])."\">...continue to full essay.</a><br><br>Posted ".date("m/d/Y", $key )."</div><br><br>";
 			}
 			$this->displayPage(BLOG_TITLE, BLOG_DESCRIPTION,
 			$all_posts); 
@@ -211,11 +215,11 @@ class Blog {
 	public function install()
 	{	if (file_exists("data.php") || file_exists(".htaccess"))
 		{ return false; } // dont overwrite these things
-		elseif(!isset($_POST['password'])) 
+		elseif (!isset($_POST['password']) || strlen($_POST['password']) < 1 ) 
 		{
 			file_put_contents("test_file_permissions","1") or $this->error("WARNING! Directory not writeable. Change the file permissions before installing."); unlink("test_file_permissions",""); ?>
 			<h2>Install brecksblog</h2>
-			<form method="post">Choose a Password <input name="password" type="password"><input type="submit" value="Install!"></form>
+			<form method="post">Choose a <b>strong</b> password <input name="password" type="password"><input type="submit" value="Install!"></form>
 			<?php exit;
 		}
 		else {
