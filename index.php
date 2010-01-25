@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.837";
+	var $version = "v0.838";
 	var $format_single_post;
 	
 	public function __construct()
@@ -63,7 +63,7 @@ class Blog {
 			elseif (isset($this->posts[$_GET['post']]) && isset($_POST['delete'])) // delete a post
 			{
 				unset($this->posts[$_GET['post']]);
-				$this->success("Post deleted.");
+				$this->success("Post deleted. <a href=\"Admin\"></a>");exit;
 			}
 			elseif (isset($this->posts[$_GET['post']])) // edit a post
 			{
