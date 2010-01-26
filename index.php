@@ -11,12 +11,12 @@ class Blog {
 		"BLOG_NAVIGATION"=>"",
 		"BLOG_FOOTER"=>"",
 		"BLOG_CSS"=>"body {font-family: arial; color: #222222; padding: 20px;}
-		h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
-		h1 a{text-decoration:none; color: #0000AA;}
-		#content {float:left; width:70%;margin-right:10px;}
-		#navigation {font-size:.8em;background:#F9F9F9; float:left; width:25%;padding: 8px;}
-		#navigation a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
-		#navigation a:hover {background: #f9f9aa;}",
+h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
+h1 a{text-decoration:none; color: #0000AA;}
+#content {float:left; width:70%;margin-right:10px;}
+#navigation {font-size:.8em;background:#F9F9F9; float:left; width:25%;padding: 8px;}
+#navigation a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
+#navigation a:hover {background: #f9f9aa;}",
 		"BLOG_HEADER"=>"",
 		"BLOG_HEAD_SCRIPTS" => "");
 		$this->install();
