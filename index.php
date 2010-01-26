@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.838";
+	var $version = "v0.840";
 	var $format_single_post;
 	
 	public function __construct()
@@ -10,15 +10,15 @@ class Blog {
 		"BLOG_URL"=> "http://".$_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
 		"BLOG_NAVIGATION"=>"",
 		"BLOG_FOOTER"=>"",
-		"BLOG_HEADER"=>"<style type=\"text/css\">
-		body {font-family: arial; color: #222222; padding: 20px;}
+		"BLOG_CSS"=>"body {font-family: arial; color: #222222; padding: 20px;}
 		h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
 		h1 a{text-decoration:none; color: #0000AA;}
 		#content {float:left; width:70%;margin-right:10px;}
 		#navigation {font-size:.8em;background:#F9F9F9; float:left; width:25%;padding: 8px;}
 		#navigation a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
-		#navigation a:hover {background: #f9f9aa;}
-		</style>");
+		#navigation a:hover {background: #f9f9aa;}",
+		"BLOG_HEADER"=>"",
+		"BLOG_HEAD_SCRIPTS" => "");
 		$this->install();
 		$this->format_single_post = 'nl2br'; // default format func
 		if (file_exists("markdown.php")) {
@@ -27,7 +27,10 @@ class Blog {
 		include("data.php");
 		$this->posts = $data['posts'];
 		$this->password = $data['password'];
-		$this->settings = $data['settings'];
+		foreach ($data['settings'] as $key => $value)
+		{
+			$this->settings[$key] = $value;
+		}
 		foreach ($this->settings as $key => $value)
 		{
 			define($key,$value);
@@ -106,7 +109,7 @@ class Blog {
 		<br><br><br><b>Settings</b>
 			<form method="post" action="editsettings">
 				<?php foreach ($this->settings as $key => $value)
-				{?><?php echo ucfirst(strtolower(str_replace("_"," ",$key)));?><br><textarea style="width:100%;" rows="4" name="<?php echo $key;?>"><?php echo $value;?></textarea><br><br><?php }?>
+				{?><?php echo ucfirst(strtolower(str_replace("_"," ",$key)));?><br><textarea style="width:100%;" rows="7" name="<?php echo $key;?>"><?php echo $value;?></textarea><br><br><?php }?>
 				Password<br><input type="password" name="password">
 				<input type="submit" value="Save">
 			</form><br><br><br><b>Upgrade</b>
@@ -164,11 +167,13 @@ class Blog {
 	
 	public function displayPage($title, $description, $body)
 	{	?><html>
-			<head><?=BLOG_HEADER?>
+			<head><?=BLOG_HEAD_SCRIPTS?>
+			<style type="text/css"><?=BLOG_CSS?></style>
 			<title><?=$title?></title>
 			<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
 			</head>
 			<body>
+			<div id="header"><?=BLOG_HEADER?></div>
 			<div id="content"><?=$body?></div>
 			<div id="navigation">
 				<b><a href="index.php" style="text-decoration:none;"><?=BLOG_TITLE?></a></b><br><?=BLOG_NAVIGATION?>
