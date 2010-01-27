@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.840";
+	var $version = "v0.841";
 	var $format_single_post;
 	
 	public function __construct()
@@ -65,8 +65,8 @@ h1 a{text-decoration:none; color: #0000AA;}
 			}
 			elseif (isset($this->posts[$_GET['post']]) && isset($_POST['delete'])) // delete a post
 			{
-				unset($this->posts[$_GET['post']]);
-				$this->success("Post deleted. <a href=\"Admin\"></a>");exit;
+				unset($this->posts[$_GET['post']]);$this->saveData();
+				$this->success("Post deleted. <a href=\"write\">Back</a>");exit;
 			}
 			elseif (isset($this->posts[$_GET['post']])) // edit a post
 			{
