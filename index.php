@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.841";
+	var $version = "v0.842";
 	var $format_single_post;
 	
 	public function __construct()
@@ -8,7 +8,7 @@ class Blog {
 		$this->settings = array("BLOG_TITLE" => "My blog",
 		"BLOG_DESCRIPTION"=>"A blog experiment.",
 		"BLOG_URL"=> "http://".$_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
-		"BLOG_NAVIGATION"=>"",
+		"BLOG_NAVIGATION_HEADER"=>"",
 		"BLOG_FOOTER"=>"",
 		"BLOG_CSS"=>"body {font-family: arial; color: #222222; padding: 20px;}
 h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
@@ -18,7 +18,8 @@ h1 a{text-decoration:none; color: #0000AA;}
 #navigation a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
 #navigation a:hover {background: #f9f9aa;}",
 		"BLOG_HEADER"=>"",
-		"BLOG_HEAD_SCRIPTS" => "");
+		"BLOG_HEAD_SCRIPTS" => "",
+		"POST_FOOTER" => "");
 		$this->install();
 		$this->format_single_post = 'nl2br'; // default format func
 		if (file_exists("markdown.php")) {
@@ -148,7 +149,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 			{
 				$post = $this->posts[$this->titles[$url]];
 				$this->displayPage($post['Title'],substr($post['Essay'],0,100),
-				"<h1>{$post['Title']}</h1><div>".call_user_func($this->format_single_post, $post['Essay'])."<br><br>Posted ".date("m/d/Y",$this->titles[$url])."</div>");
+				"<h1>{$post['Title']}</h1><div>".call_user_func($this->format_single_post, $post['Essay'])."<br><br><div class=\"dateposted\">Posted ".date("m/d/Y",$this->titles[$url])."</div>". POST_FOOTER ."</div>");
 			}
 			else {
 				?>Oops! File not found. <a href="index.php">Back to blog</a>.<?php
@@ -158,7 +159,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 			$all_posts = ""; // Might want to limit it to most recent 5 or so posts.
 			foreach ($this->posts as $key => $post)
 			{
-				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".call_user_func($this->format_single_post, substr(strip_tags($post['Essay']),0,150))."<a href=\"".$this->prettyUrl($post['Title'])."\">...continue to full essay.</a><br><br>Posted ".date("m/d/Y", $key )."</div><br><br>";
+				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".call_user_func($this->format_single_post, substr(strip_tags($post['Essay']),0,150))."<a href=\"".$this->prettyUrl($post['Title'])."\">...continue to full essay.</a><br><br><div class=\"dateposted\">Posted ".date("m/d/Y", $key )."</div></div><br><br>";
 			}
 			$this->displayPage(BLOG_TITLE, BLOG_DESCRIPTION,
 			$all_posts); 
@@ -176,8 +177,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 			<div id="header"><?=BLOG_HEADER?></div>
 			<div id="content"><?=$body?></div>
 			<div id="navigation">
-				<b><a href="index.php" style="text-decoration:none;"><?=BLOG_TITLE?></a></b><br><?=BLOG_NAVIGATION?>
-				<br>Posts:
+				<?=BLOG_NAVIGATION_HEADER?>
 				<?php 
 					foreach ($this->posts as $post)
 					{
