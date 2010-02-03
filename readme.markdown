@@ -29,22 +29,22 @@ No. However, if you know HTML, CSS, and/or JavaScript, you can get even more out
 ### What are the requirements? 
 You need PHP and Apache with mod_rewrite for it to work.
 
-### Features
+### Benefits
 
-- Simple software forces you to focus on what's important in blogging: content!
-- Does great SEO for you. Handles URLs and meta tags automatically. All you need to do is write great content and get inbound links
-- Simple. No complicated database or lots of files to install.
-- No login. Go immediately to writing or editing.
-- Easy to extend(if you want to). While we'll keep it small and simple, feel free to customize your own version.
-- Create multiple blogs fast! Just make one folder per blog.
-- Drop markdown.php in to your blog folder to add markdown support.
-- Stores all data in one text file (data.php). No database needed!
-- Easy to write, edit, and delete posts!
-- No login needed. Just use your password each time you edit a page.
-- SEO friendly URLs, titles, and meta description.
-- Less than 250 lines of code! Easy to extend and modify.
+- Easy. Even your mom can use it (mine does)!
+- Productive. Simple software forces you to focus on what's important in blogging: content.
+- Extendible. Change the theme. Add markdown. Add javascript. All of these steps take a few seconds.
+- Reliable. Has held up without a hiccup on some high traffic sites. Open source and small file size means anyone can fix or extend it.
+- Painless. No complicated database. Only one file.
+
+### Features
+- No login needed. Just use your password each time you edit a page. Counterintuitive, but pretty fun.
+- Create multiple blogs fast. Just make one folder per blog.
+- Drop markdown.php into your blog folder to easily add markdown support.
+- Stores all data in one text file (data.php). No database needed.
+- Easy to write, edit, and delete posts. Easy to chang CSS, footer, header, etc.
+- Less than 250 lines of code. Easy to extend and modify.
 - Simple, clean layout. Easy to change CSS.
-- You can add HTML, Javascript, and CSS to your posts.
 - Easily change the layout or add analytics, etc.
 - Works great under loads (so far).
 - Easy 1 file install.
@@ -76,7 +76,7 @@ Released under the MIT license.
 
 ### Todo
 
-- Get it under 100 lines.
+- Get it under 200 lines.
 - Reduce long lines to under 80 characters.
 - Better security (specifically against brute force attacks)
 - Generate sitemaps for Google?
