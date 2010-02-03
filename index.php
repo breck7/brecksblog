@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.842";
+	var $version = "v0.843";
 	var $format_single_post;
 	
 	public function __construct()
@@ -95,7 +95,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 		(is_writable("data.php") ? "" : $this->error("WARNING! data.php not writeable") );
 		?><div style="font-family:Arial;"><table style="width:100%;" cellpadding="10px"><tr>
 		<td width="62.5%" valign="top"><form method="post" action=""><table style="width:100%;">
-		<tr><td>Title</td><td style="width:100%;"><input type="text" name="title" style="width:100%;" value="<?=$title_value?>"></td></tr>
+		<tr><td>Title</td><td style="width:100%;"><input type="text" name="title" style="width:100%;" value="<?=htmlentities($title_value)?>"></td></tr>
 		<tr><td>Content</td><td><textarea name="essay" rows="15" style="width:100%;"><?=$essay_value?></textarea></td></tr>
 		<tr><td>Password</td><td><input type="password" name="password"></td></tr>
 		<tr><td></td><td><input type="submit" value="Save"><?=$delete_button?></td></tr></table></form></td>
