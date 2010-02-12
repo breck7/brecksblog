@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.843";
+	var $version = "v0.844";
 	var $format_single_post;
 	
 	public function __construct()
@@ -9,6 +9,7 @@ class Blog {
 		"BLOG_DESCRIPTION"=>"A blog experiment.",
 		"BLOG_URL"=> "http://".$_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
 		"BLOG_NAVIGATION_HEADER"=>"",
+		"BLOG_NAVICATION_FOOTER"=>"",
 		"BLOG_FOOTER"=>"",
 		"BLOG_CSS"=>"body {font-family: arial; color: #222222; padding: 20px;}
 h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
@@ -187,6 +188,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 				?>
 				<br><a href="feed">RSS</a>
 				<a href="write" rel="nofollow">Admin</a>
+				<?=BLOG_NAVIGATION_FOOTER?>
 			</div>
 			<div id="footer"><?=BLOG_FOOTER?></div>
 			</body>
