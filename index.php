@@ -1,7 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.844";
-	var $format_single_post;
+	var $version = "v0.846";
 	
 	public function __construct()
 	{	// set default settings
@@ -9,7 +8,7 @@ class Blog {
 		"BLOG_DESCRIPTION"=>"A blog experiment.",
 		"BLOG_URL"=> "http://".$_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'],
 		"BLOG_NAVIGATION_HEADER"=>"",
-		"BLOG_NAVICATION_FOOTER"=>"",
+		"BLOG_NAVIGATION_FOOTER"=>"",
 		"BLOG_FOOTER"=>"",
 		"BLOG_CSS"=>"body {font-family: arial; color: #222222; padding: 20px;}
 h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
@@ -22,10 +21,6 @@ h1 a{text-decoration:none; color: #0000AA;}
 		"BLOG_HEAD_SCRIPTS" => "",
 		"POST_FOOTER" => "");
 		$this->install();
-		$this->format_single_post = 'nl2br'; // default format func
-		if (file_exists("markdown.php")) {
-			include_once("markdown.php"); $this->format_single_post = 'Markdown';
-		}
 		include("data.php");
 		$this->posts = $data['posts'];
 		$this->password = $data['password'];
@@ -83,6 +78,17 @@ h1 a{text-decoration:none; color: #0000AA;}
 	public function saveData()
 	{	$data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password);
 		file_put_contents("data.php", "<?php \$data= ".var_export($data, true) . "?>");
+	}
+	
+	public function format_post($post)
+	{
+		if (file_exists("markdown.php") && !preg_match('/^<nomarkdown>/',$post)) {
+			include_once("markdown.php"); 
+			return Markdown($post);
+		}
+		else {
+			return nl2br($post);
+		}
 	}
 
 	public function displayEditor ()
@@ -150,7 +156,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 			{
 				$post = $this->posts[$this->titles[$url]];
 				$this->displayPage($post['Title'],substr($post['Essay'],0,100),
-				"<h1>{$post['Title']}</h1><div>".call_user_func($this->format_single_post, $post['Essay'])."<br><br><div class=\"dateposted\">Posted ".date("m/d/Y",$this->titles[$url])."</div>". POST_FOOTER ."</div>");
+				"<h1>{$post['Title']}</h1><div>".$this->format_post($post['Essay'])."<br><br><div class=\"dateposted\">Posted ".date("m/d/Y",$this->titles[$url])."</div>". POST_FOOTER ."</div>");
 			}
 			else {
 				?>Oops! File not found. <a href="index.php">Back to blog</a>.<?php
@@ -160,7 +166,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 			$all_posts = ""; // Might want to limit it to most recent 5 or so posts.
 			foreach ($this->posts as $key => $post)
 			{
-				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".call_user_func($this->format_single_post, substr(strip_tags($post['Essay']),0,150))."<a href=\"".$this->prettyUrl($post['Title'])."\">...continue to full essay.</a><br><br><div class=\"dateposted\">Posted ".date("m/d/Y", $key )."</div></div><br><br>";
+				$all_posts .= "<h1><a href=\"".$this->prettyUrl($post['Title'])."\">{$post['Title']}</a></h1><div>".$this->format_post(substr(strip_tags($post['Essay']),0,150))."<a href=\"".$this->prettyUrl($post['Title'])."\">...continue to full essay.</a><br><br><div class=\"dateposted\">Posted ".date("m/d/Y", $key )."</div></div><br><br>";
 			}
 			$this->displayPage(BLOG_TITLE, BLOG_DESCRIPTION,
 			$all_posts); 
@@ -210,7 +216,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 						?><item>
 						<title><?php echo $post['Title'];?></title>
 						<link><?php echo BLOG_URL . $this->prettyUrl($post['Title']);?></link>
-						<description><?php echo call_user_func($this->format_single_post, str_replace("&","&amp;",strip_tags($post['Essay'])));?></description>
+						<description><?php echo $this->format_post(str_replace("&","&amp;",strip_tags($post['Essay'])));?></description>
 						</item><?php
 					}
 				?>
@@ -244,4 +250,4 @@ IndexIgnore *");
 		}
 	}
 }
-$blog = new Blog; ?>
+$blog = new Blog;
