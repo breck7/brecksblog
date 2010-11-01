@@ -86,9 +86,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 			include_once("markdown.php"); 
 			return Markdown($post);
 		}
-		else {
-			return nl2br($post);
-		}
+		return nl2br($post);
 	}
 
 	public function displayEditor ()
