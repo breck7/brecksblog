@@ -1,6 +1,6 @@
 <?php
 class Blog {
-	var $version = "v0.846";
+	public $version = "v0.847";
 	
 	public function __construct()
 	{	// set default settings
@@ -174,7 +174,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 	}
 	
 	public function displayPage($title, $description, $body)
-	{	?><html>
+	{	?><!doctype html>
 			<head><?=BLOG_HEAD_SCRIPTS?>
 			<style type="text/css"><?=BLOG_CSS?></style>
 			<title><?=$title?></title>
