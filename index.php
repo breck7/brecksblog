@@ -1,7 +1,7 @@
 <?php
 class Blog {
     
-	public $version = "v0.847";
+	public $version = "v0.8.5";
 	
 	public function __construct()
 	{	// set default settings
@@ -190,6 +190,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 	public function displayPage($title, $description, $body)
 	{
   ?><!doctype html>
+  <html>
   <head><?php echo BLOG_HEAD_SCRIPTS?>
     <style type="text/css"><?php echo BLOG_CSS?></style>
     <title><?php echo $title?></title>
