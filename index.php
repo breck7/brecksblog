@@ -1,5 +1,6 @@
 <?php
 class Blog {
+    
 	public $version = "v0.847";
 	
 	public function __construct()
@@ -52,7 +53,8 @@ h1 a{text-decoration:none; color: #0000AA;}
 	{	return strtolower(str_replace(" ","_",preg_replace('/[^a-z0-9 ]/i',"",$title_string)));}
 	
 	public function saveBlog()
-	{	if (count($_POST) && $this->pw())
+	{
+	    if (count($_POST) && $this->pw())
 		{
 			if (!isset($_GET['post'])) // create new post
 			{	$time = time();
@@ -76,13 +78,15 @@ h1 a{text-decoration:none; color: #0000AA;}
 	}
 
 	public function saveData()
-	{	$data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password);
+	{
+	    $data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password);
 		file_put_contents("data.php", "<?php \$data= ".var_export($data, true) . "?>");
 	}
 	
 	public function format_post($post)
 	{
-		if (file_exists("markdown.php") && !preg_match('/^<nomarkdown>/',$post)) {
+		if (file_exists("markdown.php") && !preg_match('/^<nomarkdown>/',$post))
+		{
 			include_once("markdown.php"); 
 			return Markdown($post);
 		}
@@ -90,7 +94,8 @@ h1 a{text-decoration:none; color: #0000AA;}
 	}
 
 	public function displayEditor ()
-	{	$title_value = ""; $essay_value = ""; $delete_button = "";
+	{
+	    $title_value = ""; $essay_value = ""; $delete_button = "";
 		if (isset($_GET['post']) && isset($this->posts[$_GET['post']]))
 		{
 			$title_value = $this->posts[$_GET['post']]['Title'];
