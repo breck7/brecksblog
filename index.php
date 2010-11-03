@@ -190,11 +190,13 @@ h1 a{text-decoration:none; color: #0000AA;}
 	public function displayPage($title, $description, $body)
 	{
   ?><!doctype html>
-  <html>
+<html>
   <head><?php echo BLOG_HEAD_SCRIPTS?>
-    <style type="text/css"><?php echo BLOG_CSS?></style>
+    <style type="text/css">
+        <?php echo BLOG_CSS?>
+    </style>
     <title><?php echo $title?></title>
-	<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
+	<meta name="description" content="<?php echo str_replace('"',"",$description);?>" />
   </head>
   <body>
     <div id="header">
@@ -206,7 +208,7 @@ h1 a{text-decoration:none; color: #0000AA;}
 	<div id="navigation">
 	  <?php echo BLOG_NAVIGATION_HEADER?>
 	  <?php foreach ($this->posts as $post) { 
-	        echo '      <a href=\"'.$this->prettyUrl($post['Title']).'">' . $post['Title'] . '</a>';
+	        echo '      <a href=\"'.$this->prettyUrl($post['Title']).'">' . $post['Title'] . "</a>\n";
         }?>
       <br><a href="feed">RSS</a>
       <a href="write" rel="nofollow">Admin</a>
