@@ -100,12 +100,12 @@ h1 a{text-decoration:none; color: #0000AA;}
 		(is_writable("data.php") ? "" : $this->error("WARNING! data.php not writeable") );
 		?><div style="font-family:Arial;"><table style="width:100%;" cellpadding="10px"><tr>
 		<td width="62.5%" valign="top"><form method="post" action=""><table style="width:100%;">
-		<tr><td>Title</td><td style="width:100%;"><input type="text" name="title" style="width:100%;" value="<?=htmlentities($title_value)?>"></td></tr>
-		<tr><td>Content</td><td><textarea name="essay" rows="15" style="width:100%;"><?=$essay_value?></textarea></td></tr>
+		<tr><td>Title</td><td style="width:100%;"><input type="text" name="title" style="width:100%;" value="<?php echo htmlentities($title_value)?>"></td></tr>
+		<tr><td>Content</td><td><textarea name="essay" rows="15" style="width:100%;"><?php echo $essay_value?></textarea></td></tr>
 		<tr><td>Password</td><td><input type="password" name="password"></td></tr>
-		<tr><td></td><td><input type="submit" value="Save"><?=$delete_button?></td></tr></table></form></td>
+		<tr><td></td><td><input type="submit" value="Save"><?php echo $delete_button?></td></tr></table></form></td>
 		<td style="color:#999999; background: #f9f9f9;">
-		<a href="index.php" style="text-decoration:none;"><?=BLOG_TITLE?></a><br><br>
+		<a href="index.php" style="text-decoration:none;"><?php echo BLOG_TITLE?></a><br><br>
 		<b>Edit</b><br>
 		<?php foreach ($this->posts as $key => $array) // display links to edit posts
 		{ echo "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";}
@@ -172,31 +172,34 @@ h1 a{text-decoration:none; color: #0000AA;}
 	}
 	
 	public function displayPage($title, $description, $body)
-	{	?><!doctype html>
-			<head><?=BLOG_HEAD_SCRIPTS?>
-			<style type="text/css"><?=BLOG_CSS?></style>
-			<title><?=$title?></title>
-			<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
-			</head>
-			<body>
-			<div id="header"><?=BLOG_HEADER?></div>
-			<div id="content"><?=$body?></div>
-			<div id="navigation">
-				<?=BLOG_NAVIGATION_HEADER?>
-				<?php 
-					foreach ($this->posts as $post)
-					{
-						?><a href="<?php echo $this->prettyUrl($post['Title']);?>">
-						<?php echo $post['Title'];?></a><?php
-					} 
-				?>
-				<br><a href="feed">RSS</a>
-				<a href="write" rel="nofollow">Admin</a>
-				<?=BLOG_NAVIGATION_FOOTER?>
-			</div>
-			<div id="footer"><?=BLOG_FOOTER?></div>
-			</body>
-			</html><?php 
+	{
+  ?><!doctype html>
+  <head><?php echo BLOG_HEAD_SCRIPTS?>
+    <style type="text/css"><?php echo BLOG_CSS?></style>
+    <title><?php echo $title?></title>
+	<meta name="description" content="<?php echo str_replace('"',"",$description);?>">
+  </head>
+  <body>
+    <div id="header">
+      <?php echo BLOG_HEADER?>
+    </div>
+	<div id="content">
+	  <?php echo $body?>
+	</div>
+	<div id="navigation">
+	  <?php echo BLOG_NAVIGATION_HEADER?>
+	  <?php foreach ($this->posts as $post) { 
+	        echo '      <a href=\"'.$this->prettyUrl($post['Title']).'">' . $post['Title'] . '</a>';
+        }?>
+      <br><a href="feed">RSS</a>
+      <a href="write" rel="nofollow">Admin</a>
+      <?php echo BLOG_NAVIGATION_FOOTER?>
+	</div>
+    <div id="footer">
+      <?php echo BLOG_FOOTER?>
+    </div>
+  </body>
+</html><?php 
 	}
 	
 	public function displayFeed()
