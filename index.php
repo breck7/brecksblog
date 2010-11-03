@@ -123,8 +123,9 @@ h1 a{text-decoration:none; color: #0000AA;}
 	}
 	
 	public function controller()
-	{	if (isset($_GET['r']))
-		{
+	{
+	    if (isset($_GET['r']))
+	    {
 			$url = array_pop(explode("/",$_GET['r']));  // Get the Redirect Path
 			if ($url == "write"){$this->saveBlog();$this->displayEditor();}
 			elseif ($url == "upgrade" && $this->pw())
@@ -132,7 +133,8 @@ h1 a{text-decoration:none; color: #0000AA;}
 				file_put_contents("index.php",file_get_contents("http://brecksblog.com/newest/index.php")) or $this->error("File permission problem. Change the file permissions on this directory.");
 				$this->success("Blog updated! <a href=\"write\">Admin</a>");exit;
 			}
-			elseif ($url == "upload" && $this->pw()){
+			elseif ($url == "upload" && $this->pw())
+			{
 				if (!preg_match('/(gif|jpeg|jpg|png|mov|avi|xls|doc|pdf|txt|html|htm|css|js)/i',end(explode('.', $_FILES["file"]["name"]))))
 				{
 					$this->error("You can't upload that type of file."); exit;
@@ -141,26 +143,35 @@ h1 a{text-decoration:none; color: #0000AA;}
 				$this->success("File <a target=\"_blank\" href=\"{$_FILES["file"]["name"]}\">saved</a> as {$_FILES["file"]["name"]}");
 				$this->displayEditor();
 			}
-			elseif ($url == "editsettings" && $this->pw()){
+			elseif ($url == "editsettings" && $this->pw())
+			{
 				unset($_POST['password']);
 				$this->settings = $_POST;
 				$this->saveData();
 				$this->success("Settings saved.");
 				$this->displayEditor();
 			}
-			elseif ($url == "json"){echo $_GET['callback'].json_encode($this->posts);}
-			elseif ($url == "feed") { $this->displayFeed();}
+			elseif ($url == "json")
+			{
+			    echo $_GET['callback'].json_encode($this->posts);
+			}
+			elseif ($url == "feed")
+			{ 
+			    $this->displayFeed();
+			}
 			elseif (isset($this->titles[$url]) ) // Post
 			{
 				$post = $this->posts[$this->titles[$url]];
 				$this->displayPage($post['Title'],substr($post['Essay'],0,100),
 				"<h1>{$post['Title']}</h1><div>".$this->format_post($post['Essay'])."<br><br><div class=\"dateposted\">Posted ".date("m/d/Y",$this->titles[$url])."</div>". POST_FOOTER ."</div>");
 			}
-			else {
+			else
+			{
 				?>Oops! File not found. <a href="index.php">Back to blog</a>.<?php
 			}
 		}
-		else { // Homepage
+		else // Display Homepage
+		{
 			$all_posts = ""; // Might want to limit it to most recent 5 or so posts.
 			foreach ($this->posts as $key => $post)
 			{
@@ -227,8 +238,9 @@ h1 a{text-decoration:none; color: #0000AA;}
 	}
 	
 	public function install()
-	{	if (file_exists("data.php") || file_exists(".htaccess"))
-		{ return false; } // dont overwrite these things
+	{
+	    if (file_exists("data.php") || file_exists(".htaccess"))
+		    return false; // dont overwrite these things
 		elseif (!isset($_POST['password']) || strlen($_POST['password']) < 1 ) 
 		{
 			file_put_contents("test_file_permissions","1") or $this->error("WARNING! Directory not writeable. Change the file permissions before installing."); unlink("test_file_permissions",""); ?>
@@ -236,18 +248,19 @@ h1 a{text-decoration:none; color: #0000AA;}
 			<form method="post">Choose a <b>strong</b> password <input name="password" type="password"><input type="submit" value="Install!"></form>
 			<?php exit;
 		}
-		else {
-		file_put_contents(".htaccess","RewriteEngine on
+		else // Run the install
+		{
+		    file_put_contents(".htaccess","RewriteEngine on
 RewriteCond %{HTTP_HOST} ^www\.(.*) [NC]
 RewriteRule ^(.*) http://%1/$1 [R=301,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^.*$ index.php?r=%{REQUEST_URI}&%{QUERY_STRING}
 IndexIgnore *");
-		$this->password = md5($_POST['password'] . "breckrand");
-		$this->posts = array(1259736228=>array('Title' => 'Hello World',
-		'Essay' => 'Your first blog post!'));
-		$this->saveData();
+		    $this->password = md5($_POST['password'] . "breckrand");
+		    $this->posts = array( 1259736228=>array('Title' => 'Hello World',
+		        'Essay' => 'Your first blog post!'));
+		    $this->saveData();
 		}
 	}
 }
