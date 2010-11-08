@@ -1,7 +1,7 @@
 <?php
 class Blog {
     
-    public $version = "v0.8.5";
+    public $version = "0.9.0";
     
     public function __construct()
     {   // set default settings
@@ -15,9 +15,10 @@ class Blog {
 h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
 h1 a{text-decoration:none; color: #0000AA;}
 #content {float:left; width:70%;margin-right:10px;}
-#navigation {font-size:.8em;background:#F9F9F9; float:left; width:25%;padding: 8px;}
-#navigation a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
-#navigation a:hover {background: #f9f9aa;}",
+#left_column {}
+#right_column {font-size:.8em;background:#F9F9F9; float:left; width:25%;padding: 8px;}
+#right_column a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
+#right_column a:hover {background: #f9f9aa;}",
         "BLOG_HEADER"=>"",
         "BLOG_HEAD_SCRIPTS" => "",
         "POST_FOOTER" => "");
@@ -205,13 +206,16 @@ h1 a{text-decoration:none; color: #0000AA;}
         <div id="header">
             <?php echo BLOG_HEADER?>
         </div>
+        <div id="left_column">
+            &nbsp;
+        </div>
         <div id="content">
             <?php echo $body?>
         </div>
-        <div id="navigation">
+        <div id="right_column">
             <?php echo BLOG_NAVIGATION_HEADER?>
             <?php foreach ($this->posts as $post) { 
-            echo '          <a href=\"'.$this->prettyUrl($post['Title']).'">' . $post['Title'] . "</a>\n";
+            echo '          <a href="'.$this->prettyUrl($post['Title']).'">' . $post['Title'] . "</a>\n";
             }?>
             <br><a href="feed">RSS</a>
             <a href="write" rel="nofollow">Admin</a>
