@@ -1,7 +1,7 @@
 <?php
 class Blog {
     
-    public $version = "0.9.0";
+    public $version = "0.9.1";
     
     public function __construct()
     {   // set default settings
@@ -169,7 +169,7 @@ h1 a{text-decoration:none; color: #0000AA;}
             {
                 $post = $this->posts[$this->titles[$url]];
                 $this->displayPage($post['Title'],substr($post['Essay'],0,100),
-                "<h1>{$post['Title']}</h1><div>".$this->format_post($post['Essay'])."<br><br><div class=\"dateposted\">Posted ".date("m/d/Y",$this->titles[$url])."</div>". POST_FOOTER ."</div>");
+                "<h1 id=\"postTitle\" post_id=\"".$this->titles[$url]."\">{$post['Title']}</h1><div>".$this->format_post($post['Essay'])."<br><br><div class=\"dateposted\">Posted ".date("m/d/Y",$this->titles[$url])."</div>". POST_FOOTER ."</div>");
             }
             else
             {
