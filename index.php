@@ -1,7 +1,7 @@
 <?php
 class Blog {
     
-    public $version = "0.9.1";
+    public $version = "0.9.2";
     
     public function __construct()
     {   // set default settings
@@ -105,7 +105,7 @@ h1 a{text-decoration:none; color: #0000AA;}
         }
         (is_writable("data.php") ? "" : $this->error("WARNING! data.php not writeable") );
         ?><div style="font-family:Arial;"><table style="width:100%;" cellpadding="10px"><tr>
-        <td width="62.5%" valign="top"><form method="post" action=""><table style="width:100%;">
+        <td width="62.5%" valign="top"><form method="post" action="write"><table style="width:100%;">
         <tr><td>Title</td><td style="width:100%;"><input type="text" name="title" style="width:100%;" value="<?php echo htmlentities($title_value)?>"></td></tr>
         <tr><td>Content</td><td><textarea name="essay" rows="15" style="width:100%;"><?php echo $essay_value?></textarea></td></tr>
         <tr><td>Password</td><td><input type="password" name="password"></td></tr>
@@ -121,7 +121,7 @@ h1 a{text-decoration:none; color: #0000AA;}
         <br><br><br><b>Settings</b>
             <form method="post" action="editsettings">
                 <?php foreach ($this->settings as $key => $value)
-                {?><?php echo ucfirst(strtolower(str_replace("_"," ",$key)));?><br><textarea style="width:100%;" rows="7" name="<?php echo $key;?>"><?php echo $value;?></textarea><br><br><?php }?>
+                {?><?php echo ucfirst(strtolower(str_replace("_"," ",$key)));?><br><textarea style="width:100%;" rows="7" name="<?php echo $key;?>"><?php echo htmlentities($value);?></textarea><br><br><?php }?>
                 Password<br><input type="password" name="password">
                 <input type="submit" value="Save">
             </form><br><br><br><b>Upgrade</b>
