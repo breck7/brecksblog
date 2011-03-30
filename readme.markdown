@@ -12,7 +12,7 @@ brecksblog is simple blogging software written in PHP that you can run on your o
 
 ### What makes brecksblog different from other blogging software?
 
-brecksblog is fast and simple. brecksblog is 1 file and does not use a database. It is less than 500 lines of code. This one file includes not only the app itself, but a one click installer and updater. 
+brecksblog is fast and simple. brecksblog is 1 file and does not use a database. It is less than 600 lines of code. This one file includes not only the app itself, but a one click installer and updater. 
 
 ### Who is it for?
 
@@ -43,7 +43,7 @@ You need PHP and Apache with mod_rewrite for it to work.
 - Drop markdown.php into your blog folder to easily add markdown support.
 - Stores all data in one text file (bbdata.php). No database needed.
 - Easy to write, edit, and delete posts. Easy to chang CSS, footer, header, etc.
-- Less than 500 lines of code. Easy to extend and modify.
+- Just a few hundred lines of code. Easy to extend and modify.
 - Simple, clean layout. Easy to change CSS.
 - Easily change the layout or add analytics, etc.
 - Works great under loads (so far).
@@ -75,13 +75,13 @@ Released under the MIT license.
 
 ### Todo
 
-- integrate real time stats
 - integrate similar posts
 - allow for more theme/style customization.
 - make it more user friendly
 - themes, real time stats, comments, user manual
+- improve default styling and ui
 
-- Get it under 400 lines.
+- Get it under 500 lines.
 - Reduce long lines to under 80 characters.
 - Generate sitemaps for Google?
 - Auto submit to blog search engines?

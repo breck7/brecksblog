@@ -18,7 +18,7 @@ class BrecksBlog {
   /**
    * Version number.
    */
-  public $version = "1.0.0";
+  public $version = "1.0.1";
 
   /**
    * Default settings for a fresh install.
@@ -69,6 +69,7 @@ IndexIgnore *";
     include("bbdata.php"); // Load the posts and settings file.
     $this->posts = $data['posts'];
     $this->password = $data['password'];
+    $this->stats = (isset($data['stats']) ? $data['stats'] : array('homepage_hits' => 0, 'homepage_uniques' => 0, 'rss_hits' => 0, 'rss_uniques' => 0));
     // Overwrite the default settings with the user's settings 
     foreach ($data['settings'] as $key => $value) {
       $this->settings[$key] = $value;
@@ -117,7 +118,10 @@ IndexIgnore *";
         echo (isset($_GET['callback']) ? $_GET['callback'] : "") . json_encode($this->posts);
       }
       elseif ($url == "feed")
-      { 
+      {
+        // Log hit
+        file_put_contents("bbdata_hits.php", "//{$_SERVER['REMOTE_ADDR']}//" . time() . "//"
+	. preg_replace("/[^a-z0-9]/i", "", $_SERVER['HTTP_REFERER']) . "//rss\n", FILE_APPEND);
         $this->echoFeed();
       }
       elseif ($url == "bbvote" && isset($_POST['post_id']) && isset($data['posts'][$_POST['post_id']]))
@@ -132,11 +136,52 @@ IndexIgnore *";
       }
       elseif ($url == "bbstats" && $this->isPasswordCorrect())
       {
+        $posts = $data['posts'];
+      
+        $hits_log = file_get_contents("bbdata_hits.php");
+        $hits = explode("\n", $hits_log);
+        array_shift($hits); // remove first line
+        array_pop($hits); // remove last line
+        $uniques = array('home' => array(), 'rss' => array());
+        foreach ($hits as $hit) {
+          list($blank, $ip, $time, $referer, $page) = explode("//", $hit);
+          if ($page == "home") {
+            $uniques['home'][$ip] = 1;
+            $this->stats['homepage_hits']++;
+          } elseif ($page == "rss") {
+            $uniques['rss'][$ip] = 1;
+            $this->stats['rss_hits']++;
+          } elseif (isset($posts[$page])) {
+            $uniques[$page][$ip] = 1;
+            $this->posts[$page]['Hits']++;
+          }
+        }
+        
+        $this->stats['rss_uniques'] += count($uniques['rss']);
+        $this->stats['homepage_uniques'] += count($uniques['home']);
+        
+        foreach ($uniques as $k => $v) {
+          if ($k != 'home' && $k != 'rss') {
+            if (isset($this->posts[$k])) {
+              $this->posts[$k]['Uniques'] += count($v);
+            }
+          }
+        }
+        
+        // for backwards compatibility.
+        foreach ($this->posts as $postkey => $postvalue) {
+          if (!isset($this->posts[$postkey]['Hits'])) {
+            $this->posts[$postkey]['Hits'] = $this->posts[$postkey]['Uniques'] = 0;
+          }
+        }
+        
+        $this->saveData();
+        
         $votes_log = file_get_contents("bbdata_votes.php");
         $votes = explode("\n", $votes_log);
         array_shift($votes); // remove first line
         array_pop($votes); // remove last line
-        $posts = $data['posts'];
+        
         foreach ($votes as $vote) 
         {
           list($blank, $post_id, $ip, $upvote, $time) = explode("//", $vote);
@@ -152,17 +197,25 @@ IndexIgnore *";
             }
           }
         }
-        foreach ($posts as $post) 
+        $stats_string = "<h2>Statistics</h2>";
+        foreach ($posts as $post)
         {
           if (!isset($post["upvotes"])) {
             $post["upvotes"] = $post["downvotes"] = 0;
           }
-          echo $post['Title'] . " " . $post["upvotes"] . "/" . ($post["upvotes"] + $post["downvotes"]) . "<br>\n";
+          $stats_string .= "<tr><td>".$post['Title'] . "</td><td>Hits: " . $post['Hits'] . "</td><td>Uniques: " . $post['Uniques'] . "</td><td> Upvotes: " . $post["upvotes"] . "/" . ($post["upvotes"] + $post["downvotes"]) . "</td></tr>";
         }
+        
+        // Flush hits log.
+        file_put_contents("bbdata_hits.php", "<?php\n");
+        $this->echoAdminPage("<div style=\" background: #e9e9e9;\"><table>$stats_string</table></div>");
       }
       elseif ( isset($this->titles[$url]) ) // Display a post
       {
         $post = $this->posts[$this->titles[$url]];
+        // Log hit
+        file_put_contents("bbdata_hits.php", "//{$_SERVER['REMOTE_ADDR']}//" . time() . "//"
+	. preg_replace("/[^a-z0-9]/i", "", $_SERVER['HTTP_REFERER']) . "//{$this->titles[$url]}\n", FILE_APPEND);
         $this->echoPage($post['Title'], substr($post['Essay'], 0, 100),
           "<h1 id=\"postTitle\" post_id=\"{$this->titles[$url]}\">{$post['Title']}</h1>" .
           "<div>" . $this->formatPost($post['Essay']) . "<br><br>" .
@@ -184,7 +237,10 @@ IndexIgnore *";
         $all_posts .= "<a href=\"" . $this->createPrettyPermalink($post['Title']) . "\">...continue to full essay.</a>";
         $all_posts .= "<div class=\"dateposted\">Posted " . date("m/d/Y", $key) . "</div></div>";
       }
-      $this->echoPage(BLOG_TITLE, BLOG_DESCRIPTION, $all_posts); 
+      // Log hit
+      file_put_contents("bbdata_hits.php", "//{$_SERVER['REMOTE_ADDR']}//" . time() . "//"
+	. preg_replace("/[^a-z0-9]/i", "", (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "")) . "//home\n", FILE_APPEND);
+      $this->echoPage(BLOG_TITLE, BLOG_DESCRIPTION, $all_posts);
     }
   }
 
@@ -315,7 +371,7 @@ IndexIgnore *";
       {
         $time = time();
         if (strlen($_POST['title']) < 1){ die("Title can't be blank"); }
-        $this->posts[$time] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
+        $this->posts[$time] = array("Title" => $_POST['title'], "Essay" => $_POST['essay'], "Hits" => 0, "Uniques" => 0);
         $this->flashSuccessMessage("<a href=\"".$this->createPrettyPermalink($_POST['title'])."\">Post created!</a> | <a href=\"bbwrite?post={$time}\">Edit it</a>");
       }
       elseif (isset($this->posts[$_GET['post']]) && isset($_POST['delete'])) // delete a post
@@ -325,7 +381,7 @@ IndexIgnore *";
       }
       elseif (isset($this->posts[$_GET['post']])) // edit a post
       {
-        $this->posts[$_GET['post']] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
+        $this->posts[$_GET['post']] = array("Title" => $_POST['title'], "Essay" => $_POST['essay'], "Hits" => (isset($this->posts[$_GET['post']]['Hits']) ? $this->posts[$_GET['post']]['Hits'] : 0), "Uniques" => (isset($this->posts[$_GET['post']]['Uniques']) ? $this->posts[$_GET['post']]['Uniques'] : 0));
         $this->flashSuccessMessage("<a href=\"".$this->createPrettyPermalink($_POST['title'])."\">Post updated!</a>");
       }
       krsort($this->posts); // Sort the posts in reverse chronological order
@@ -338,7 +394,7 @@ IndexIgnore *";
    */
   public function saveData()
   {
-    $data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password);
+    $data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password, "stats" => $this->stats);
     file_put_contents("bbdata.php", "<?php \$data= ".var_export($data, true) . "?>");
   }
 
@@ -358,7 +414,7 @@ IndexIgnore *";
   /**
    * Displays the blog admin page.
    */
-  public function echoAdminPage()
+  public function echoAdminPage($stats_string = "")
   {
     $title_value = $essay_value = $delete_button = $edit_action = "";
     if (isset($_GET['post']) && isset($this->posts[$_GET['post']]))
@@ -383,6 +439,7 @@ IndexIgnore *";
       <?php if ($_SERVER['SERVER_PORT'] == 80) {echo "<br>WARNING! Non-https connection. <a href=\"https".str_replace("index.php", "bbwrite", substr(BLOG_URL,4))."\">Switch to https</a>.";}?>
       <table cellpadding="10px"><tr>
         <td width="62.5%">
+          <?php echo $stats_string;?>
           <form method="post" action="bbwrite<?php echo $edit_action;?>">
             <table>
               <tr>
@@ -474,10 +531,12 @@ IndexIgnore *";
     {
       file_put_contents(".htaccess", $this->htaccess);
       file_put_contents("bbdata_votes.php", "<?php\n");
+      file_put_contents("bbdata_hits.php", "<?php\n");
       file_put_contents("bbdata_blockedips.php", "<?php \$blocked_ips= " . var_export(array(), true) . "?>");
       $this->password = md5($_POST['password'] . "breckrand");
       $this->posts = array( 1259736228 => array('Title' => 'Hello World',
         'Essay' => 'Your first blog post!'));
+      $this->stats = array('homepage_hits' => 0, 'homepage_uniques' => 0, 'rss_hits' => 0, 'rss_uniques' => 0);
       $this->saveData();
     }
   }
