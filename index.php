@@ -67,6 +67,7 @@ IndexIgnore *";
     include("data.php"); // Load the posts and settings file.
     $this->posts = $data['posts'];
     $this->password = $data['password'];
+    $this->blocked_ips = (isset($data['blocked_ips']) ? $data['blocked_ips'] : array());
     // Overwrite the default settings with the user's settings 
     foreach ($data['settings'] as $key => $value) {
       $this->settings[$key] = $value;
@@ -228,8 +229,27 @@ IndexIgnore *";
    */
   public function isPasswordCorrect()
   {
-    if (isset($_POST['password']) && (md5($_POST['password'] . "breckrand") == $this->password)) {
-      return true;
+    if (isset($_POST['password'])) {
+      // blocked
+      if (isset($this->blocked_ips[$_SERVER['REMOTE_ADDR']]) && $this->blocked_ips[$_SERVER['REMOTE_ADDR']]['count'] > 20 && $this->blocked_ips[$_SERVER['REMOTE_ADDR']]['last_attempt'] > (time()-1800)) {
+        die("Too many bad password attempts. Wait 30 minutes then try again.");
+      } // not blocked and correct
+      elseif (md5($_POST['password'] . "breckrand") == $this->password) {
+        if (isset($this->blocked_ips[$_SERVER['REMOTE_ADDR']])) {
+          unset($this->blocked_ips[$_SERVER['REMOTE_ADDR']]);
+          $this->saveData();
+        }
+        return true;
+      } // not blocked and incorrect
+      else {
+        if (isset($this->blocked_ips[$_SERVER['REMOTE_ADDR']])) {
+          $this->blocked_ips[$_SERVER['REMOTE_ADDR']]['count']++;
+          $this->blocked_ips[$_SERVER['REMOTE_ADDR']]['last_attempt'] = time();
+        } else {
+          $this->blocked_ips[$_SERVER['REMOTE_ADDR']] = array('count' => 1, 'last_attempt' => time());
+        }
+        $this->saveData();
+      }
     }
     die("Invalid Password");
   }
@@ -276,7 +296,7 @@ IndexIgnore *";
    */
   public function saveData()
   {
-    $data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password);
+    $data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password, "blocked_ips" => $this->blocked_ips);
     file_put_contents("data.php", "<?php \$data= ".var_export($data, true) . "?>");
   }
 
@@ -318,6 +338,7 @@ IndexIgnore *";
       </style>
     </head>
     <body>
+      <?php if ($_SERVER['SERVER_PORT'] == 80) {echo "WARNING! Non-https connection. <a href=\"https".str_replace("index.php", "write", substr(BLOG_URL,4))."\">Switch to https</a>.";}?>
       <table cellpadding="10px"><tr>
         <td width="62.5%">
           <form method="post" action="write<?php echo $edit_action;?>">

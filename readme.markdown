@@ -56,9 +56,8 @@ You need PHP and Apache with mod_rewrite for it to work.
 
 - File permissions. Your file permissions have to be set correctly. Make sure the directory is writeable during install and index.php is writeable if you want to use the updater.
 - Mod_rewrite. You need mod_rewrite enabled for it to work.
-- Untested. This software has not been thoroughly tested.
+- Untested. This software has not been thoroughly tested. Unit tests on various platforms coming soon.
 - Password. If someone guesses your password, they can change your posts and settings.
-- Brute force password guessing. There is no protection yet against brute force guessing attempts.
 - Things that may break it: posts with the same timestamp or name. Having lots of posts. Getting lots of traffic while editing.
 - No backups. There is no system yet to auto backup your posts and settings. This will be added.
 
@@ -78,16 +77,17 @@ Released under the MIT license.
 
 - Get it under 400 lines.
 - Reduce long lines to under 80 characters.
-- Better security (specifically against brute force attacks)
 - Generate sitemaps for Google?
 - Auto submit to blog search engines?
-- Make it easy to include external Javascript libraries for:
-> backup/autosave(etherpad like)
-> wysiwyg
-> comments
+- Test file locking issues and weaknesses more(security issues?).
 - haml support?
 - plugin architecture
 - unit tests
 - integrate real time stats
 - integrate post upvoting/downvoting
 - integrate similar posts
+- internationalization
+- Make it easy to include external Javascript libraries for:
+> backup/autosave(etherpad like)
+> wysiwyg
+> comments
