@@ -27,18 +27,21 @@ class BrecksBlog {
     "BLOG_DESCRIPTION" => "A blog experiment.",
     "BLOG_HEADER" => "",
     "BLOG_HEAD_SCRIPTS" => "",
-    "BLOG_NAVIGATION_HEADER" => "",
-    "BLOG_NAVIGATION_FOOTER" => "",
-    "BLOG_FOOTER" => "",
+    "BLOG_NAVIGATION_HEADER" => "<a href=\"index.php\">Home</a><br>",
+    "BLOG_NAVIGATION_FOOTER" => '<br><a href="feed">RSS</a><a href="write" rel="nofollow">Admin</a>',
+    "BLOG_FOOTER" => "Powered by <a href=\"http://brecksblog.com\">brecksblog</a>",
     "POST_FOOTER" => "",
-    "BLOG_CSS" => "body {font-family: arial; color: #222222; padding: 20px;}
-      h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
-      h1 a{text-decoration:none; color: #0000AA;}
-      #content {float:left; width:70%;margin-right:10px;}
-      #left_column {}
-      #right_column {font-size:.8em;background:#F9F9F9; float:left; width:25%;padding: 8px;}
-      #right_column a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
-      #right_column a:hover {background: #f9f9aa;}",
+    "BLOG_CSS" => "body {font-family: arial; color: #222222; padding: 10px;}
+h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
+h1 a {text-decoration:none; color: #0000AA;}
+h2 {margin-top: 0px;}
+#content {float:left; width:70%; margin-right:10px;}
+#left_column {}
+#right_column {font-size:.8em; background: #F9F9F9; float: left; width: 25%; padding: 8px;}
+#right_column a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
+#right_column a:hover {background: #f9f9aa;}
+#footer {clear: both; text-align: center; font-size: .8em; color: #888888; padding-top: 20px;}
+.dateposted {margin: 15px 0px;}",
   );
   
   /**
@@ -109,7 +112,7 @@ IndexIgnore *";
       }
       elseif ($url == "json")
       {
-        echo $_GET['callback'] . json_encode($this->posts);
+        echo (isset($_GET['callback']) ? $_GET['callback'] : "") . json_encode($this->posts);
       }
       elseif ($url == "feed")
       { 
@@ -135,9 +138,9 @@ IndexIgnore *";
       foreach ($this->posts as $key => $post)
       {
         $all_posts .= "<h2><a href=\"" . $this->createPrettyPermalink($post['Title']) . "\">{$post['Title']}</a></h2>";
-        $all_posts .= "<div>" . $this->formatPost(substr(strip_tags($post['Essay']), 0, 150));
+        $all_posts .= "<div class=\"post_snippet\">" . $this->formatPost(substr(strip_tags($post['Essay']), 0, 150));
         $all_posts .= "<a href=\"" . $this->createPrettyPermalink($post['Title']) . "\">...continue to full essay.</a>";
-        $all_posts .= "<br><br><div class=\"dateposted\">Posted " . date("m/d/Y", $key) . "</div></div><br><br>";
+        $all_posts .= "<div class=\"dateposted\">Posted " . date("m/d/Y", $key) . "</div></div>";
       }
       $this->echoPage(BLOG_TITLE, BLOG_DESCRIPTION, $all_posts); 
     }
@@ -152,31 +155,29 @@ IndexIgnore *";
   ?><!doctype html>
 <html>
   <head>
-      <?php echo BLOG_HEAD_SCRIPTS ."\n"?>
-      <style type="text/css">
-          <?php echo BLOG_CSS?>
-      </style>
-      <title><?php echo $title?></title>
-      <meta name="description" content="<?php echo str_replace('"',"",$description);?>" />
+    <?php echo BLOG_HEAD_SCRIPTS ."\n"; ?>
+    <style type="text/css">
+      <?php echo BLOG_CSS; ?>
+    </style>
+    <title><?php echo $title; ?></title>
+    <meta name="description" content="<?php echo str_replace('"',"",$description);?>" />
   </head>
   <body>
     <div id="header">
-      <?php echo BLOG_HEADER?>
+      <?php echo BLOG_HEADER; ?>
     </div>
     <div id="left_column">
       &nbsp;
     </div>
     <div id="content">
-      <?php echo $body?>
+      <?php echo $body; ?>
     </div>
     <div id="right_column">
-      <?php echo BLOG_NAVIGATION_HEADER?>
+      <?php echo BLOG_NAVIGATION_HEADER; ?>
       <?php foreach ($this->posts as $post) { 
         echo '          <a href="'.$this->createPrettyPermalink($post['Title']).'">' . $post['Title'] . "</a>\n";
       }?>
-      <br><a href="feed">RSS</a>
-      <a href="write" rel="nofollow">Admin</a>
-      <?php echo BLOG_NAVIGATION_FOOTER?>
+      <?php echo BLOG_NAVIGATION_FOOTER; ?>
     </div>
     <div id="footer">
       <?php echo BLOG_FOOTER; ?>
@@ -306,45 +307,80 @@ IndexIgnore *";
       $delete_button = "<input type=\"submit\" value=\"Delete\" name=\"delete\" onclick=\"return confirm('DELETE. Are you sure?');\"><br><br><a href=\"write\">Create new post</a>";
     }
     is_writable("data.php") or die("WARNING! data.php not writeable");
-    ?><div style="font-family:Arial;">
-    <table style="width:100%;" cellpadding="10px"><tr>
-      <td width="62.5%" valign="top">
-        <form method="post" action="write<?php echo $edit_action;?>">
-        <table style="width:100%;">
-          <tr><td>Title</td><td style="width:100%;"><input type="text" name="title" style="width:100%;" value="<?php echo htmlentities($title_value)?>"></td></tr>
-          <tr><td>Content</td><td><textarea name="essay" rows="15" style="width:100%;"><?php echo $essay_value?></textarea></td></tr>
-          <tr><td>Password</td><td><input type="password" name="password"></td></tr>
-          <tr><td></td><td><input type="submit" value="Save"><?php echo $delete_button?></td></tr>
-        </table>
-        </form>
-      </td>
-      <td style="color:#999999; background: #f9f9f9;">
-        <a href="index.php" style="text-decoration:none;"><?php echo BLOG_TITLE?></a><br><br>
-        <b>Edit</b><br>
-        <?php foreach ($this->posts as $key => $array) // display links to edit posts
-        {
-          echo "<a href=\"write?post=".$key."\">{$array['Title']}</a><br>";
-        }
-        ?>
-        <br><br><br><b>Upload File</b>
-        <form action="upload" method="post" enctype="multipart/form-data">
-          <input type="file" name="file"><br>Password<br><input type="password" name="password">
-          <input type="submit" value="Upload">
-        </form>
-        <br><br><br><b>Settings</b>
-        <form method="post" action="editsettings">
-          <?php foreach ($this->settings as $key => $value)
-          {?><?php echo ucfirst(strtolower(str_replace("_"," ",$key)));?><br><textarea style="width:100%;" rows="7" name="<?php echo $key;?>"><?php echo htmlentities($value);?></textarea><br><br><?php }?>
-          Password<br><input type="password" name="password">
-          <input type="submit" value="Save">
-        </form>
-        <br><br><br><b>Upgrade</b>
-        <br>brecksblog version: <?php echo $this->version;?><br>
-        <form action="upgrade" method="post">
-          Password<br><input type="password" name="password"><input type="submit" value="Upgrade">
+    ?><!doctype html>
+    <html>
+    <head>
+      <style>
+        body {font-family: Arial;}
+        div {margin-top: 10px;}
+        table {width: 100%;}
+        td {vertical-align: top;}
+      </style>
+    </head>
+    <body>
+      <table cellpadding="10px"><tr>
+        <td width="62.5%">
+          <form method="post" action="write<?php echo $edit_action;?>">
+            <table>
+              <tr>
+                <td>Title</td>
+                <td style="width:100%;"><input type="text" name="title" style="width:100%;" value="<?php echo htmlentities($title_value)?>"></td>
+              </tr>
+              <tr>
+                <td>Content</td>
+                <td><textarea name="essay" rows="15" style="width:100%;"><?php echo $essay_value?></textarea></td>
+              </tr>
+              <tr>
+                <td>Password</td>
+                <td><input type="password" name="password"></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td><input type="submit" value="Save"><?php echo $delete_button?></td>
+              </tr>
+            </table>
           </form>
-      </td></tr>
-    </table></div><?php
+        </td>
+        <td style="color:#999999; background: #f9f9f9;">
+          <div>
+            <a href="index.php" style="text-decoration:none;"><?php echo BLOG_TITLE?></a>
+          </div>
+          <div>
+            <b>Posts</b><br>
+            <?php foreach ($this->posts as $key => $array) // display links to edit posts
+            {
+              echo "<a href=\"" . $this->createPrettyPermalink($array['Title']) . "\">{$array['Title']}</a> | <a href=\"write?post=".$key."\">edit</a><br>";
+            }
+            ?>
+          </div>
+          <div>
+            <b>Upload File</b>
+            <form action="upload" method="post" enctype="multipart/form-data">
+              <input type="file" name="file">
+              <br>Password<br><input type="password" name="password">
+              <input type="submit" value="Upload">
+            </form>
+          </div>
+          <div>
+            <b>Settings</b>
+            <form method="post" action="editsettings">
+              <?php foreach ($this->settings as $key => $value)
+              {?><?php echo ucfirst(strtolower(str_replace("_"," ",$key)));?><br><textarea style="width:100%;" rows="7" name="<?php echo $key;?>"><?php echo htmlentities($value);?></textarea><br><br><?php }?>
+              Password<br><input type="password" name="password">
+              <input type="submit" value="Save">
+            </form>
+          </div>
+          <div>
+            <b>Upgrade</b>
+            <br>brecksblog version: <?php echo $this->version;?><br>
+            <form action="upgrade" method="post">
+              Password<br><input type="password" name="password"><input type="submit" value="Upgrade">
+            </form>
+          </div>
+        </td></tr>
+      </table>
+    </body>
+    </html><?php
   }
 
   /**
