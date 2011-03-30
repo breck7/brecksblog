@@ -41,7 +41,7 @@ You need PHP and Apache with mod_rewrite for it to work.
 - No login needed. Just use your password each time you edit a page. Counterintuitive, but pretty fun.
 - Create multiple blogs fast. Just make one folder per blog.
 - Drop markdown.php into your blog folder to easily add markdown support.
-- Stores all data in one text file (data.php). No database needed.
+- Stores all data in one text file (bbdata.php). No database needed.
 - Easy to write, edit, and delete posts. Easy to chang CSS, footer, header, etc.
 - Less than 500 lines of code. Easy to extend and modify.
 - Simple, clean layout. Easy to change CSS.
@@ -75,19 +75,22 @@ Released under the MIT license.
 
 ### Todo
 
+- integrate real time stats
+- integrate post upvoting/downvoting
+- integrate similar posts
+- allow for more theme/style customization.
+- make it more user friendly
+
 - Get it under 400 lines.
 - Reduce long lines to under 80 characters.
 - Generate sitemaps for Google?
 - Auto submit to blog search engines?
 - Test file locking issues and weaknesses more(security issues?).
 - haml support?
-- plugin architecture
+- sass support?
 - unit tests
-- integrate real time stats
-- integrate post upvoting/downvoting
-- integrate similar posts
 - internationalization
-- Make it easy to include external Javascript libraries for:
+- Plugin architecture. Make it easy to include external Javascript plugins/ libraries for:
 > backup/autosave(etherpad like)
 > wysiwyg
 > comments

@@ -17,7 +17,7 @@ class BrecksBlog {
   /**
    * Version number.
    */
-  public $version = "0.9.3";
+  public $version = "1.0.0";
 
   /**
    * Default settings for a fresh install.
@@ -28,9 +28,9 @@ class BrecksBlog {
     "BLOG_HEADER" => "",
     "BLOG_HEAD_SCRIPTS" => "",
     "BLOG_NAVIGATION_HEADER" => "<a href=\"index.php\">Home</a><br>",
-    "BLOG_NAVIGATION_FOOTER" => '<br><a href="feed">RSS</a><a href="write" rel="nofollow">Admin</a>',
-    "BLOG_FOOTER" => "Powered by <a href=\"http://brecksblog.com\">brecksblog</a>",
-    "POST_FOOTER" => "",
+    "BLOG_NAVIGATION_FOOTER" => '<br><a href="feed">RSS</a><a href="bbwrite" rel="nofollow">Admin</a>',
+    "BLOG_FOOTER" => "Powered by <a href=\"http://brecksblog.com\">brecksblog</a><script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js\"></script>",
+    "POST_FOOTER" => '<div id="bbvote">Was this essay useful to you? <a onclick="$.post(\'bbvote\',{upvote : 1, post_id : $(\'#postTitle\').attr(\'post_id\')},function(data){$(\'#bbvote\').html(\'Thanks!\');return false;});">Yes</a> | <a onclick="$.post(\'bbvote\',{post_id : $(\'#postTitle\').attr(\'post_id\')},function(data){$(\'#bbvote\').html(\'Thanks!\');return false;});">No</a></div>',
     "BLOG_CSS" => "body {font-family: arial; color: #222222; padding: 10px;}
 h1 {margin-top: 0px; border-bottom: 1px solid #999999; font-size:26px;}
 h1 a {text-decoration:none; color: #0000AA;}
@@ -40,6 +40,7 @@ h2 {margin-top: 0px;}
 #right_column {font-size:.8em; background: #F9F9F9; float: left; width: 25%; padding: 8px;}
 #right_column a{display: block; padding: 3px; text-decoration:none; color:#0000AA;}
 #right_column a:hover {background: #f9f9aa;}
+#bbvote a {cursor: pointer; color: blue;}
 #footer {clear: both; text-align: center; font-size: .8em; color: #888888; padding-top: 20px;}
 .dateposted {margin: 15px 0px;}",
   );
@@ -64,10 +65,9 @@ IndexIgnore *";
     // Set default url dynamically.
     $this->settings['BLOG_URL'] = "http://".$_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
     $this->installIfNotInstalled();    // Run install routine if a new blog.
-    include("data.php"); // Load the posts and settings file.
+    include("bbdata.php"); // Load the posts and settings file.
     $this->posts = $data['posts'];
     $this->password = $data['password'];
-    $this->blocked_ips = (isset($data['blocked_ips']) ? $data['blocked_ips'] : array());
     // Overwrite the default settings with the user's settings 
     foreach ($data['settings'] as $key => $value) {
       $this->settings[$key] = $value;
@@ -83,17 +83,17 @@ IndexIgnore *";
     if (isset($_GET['r'])) 
     {
       $url = array_pop(explode("/", $_GET['r']));  // Get the Redirect Path
-      if ($url == "write")
+      if ($url == "bbwrite")
       {
         $this->modifyPost();
         $this->echoAdminPage();
       }
-      elseif ($url == "upgrade" && $this->isPasswordCorrect())
+      elseif ($url == "bbupgrade" && $this->isPasswordCorrect())
       {
         file_put_contents("index.php", file_get_contents("http://brecksblog.com/newest/index.php")) or die("File permission problem. Change the file permissions on this directory.");
-        $this->flashSuccessMessage("Blog updated! <a href=\"write\">Admin</a>"); exit;
+        $this->flashSuccessMessage("Blog updated! <a href=\"bbwrite\">Admin</a>"); exit;
       }
-      elseif ($url == "upload" && $this->isPasswordCorrect())
+      elseif ($url == "bbupload" && $this->isPasswordCorrect())
       {
         if (!preg_match('/(gif|jpeg|jpg|png|mov|avi|xls|doc|pdf|txt|html|htm|css|js)/i',end(explode('.', $_FILES["file"]["name"]))))
         {
@@ -103,7 +103,7 @@ IndexIgnore *";
         $this->flashSuccessMessage("File <a target=\"_blank\" href=\"{$_FILES["file"]["name"]}\">saved</a> as {$_FILES["file"]["name"]}");
         $this->echoAdminPage();
       }
-      elseif ($url == "editsettings" && $this->isPasswordCorrect())
+      elseif ($url == "bbeditsettings" && $this->isPasswordCorrect())
       {
         unset($_POST['password']); // Don't resave the password.
         $this->settings = $_POST;
@@ -118,6 +118,46 @@ IndexIgnore *";
       elseif ($url == "feed")
       { 
         $this->echoFeed();
+      }
+      elseif ($url == "bbvote" && isset($_POST['post_id']) && isset($data['posts'][$_POST['post_id']]))
+      {
+        $string = "//" . $_POST['post_id']
+          . "//" . $_SERVER['REMOTE_ADDR'] 
+          . "//" . (isset($_POST['upvote']) ? 1 : 0)
+          . "//" . time()
+          . "\n";
+        file_put_contents("bbdata_votes.php", $string, FILE_APPEND);
+        echo "Thanks for your feedback!";
+      }
+      elseif ($url == "bbstats" && $this->isPasswordCorrect())
+      {
+        $votes_log = file_get_contents("bbdata_votes.php");
+        $votes = explode("\n", $votes_log);
+        array_shift($votes); // remove first line
+        array_pop($votes); // remove last line
+        $posts = $data['posts'];
+        foreach ($votes as $vote) 
+        {
+          list($blank, $post_id, $ip, $upvote, $time) = explode("//", $vote);
+          if (isset($posts[$post_id])) {
+            if (!isset($posts[$post_id]["voters"])) {
+              $posts[$post_id]["voters"] = array();
+              $posts[$post_id]["upvotes"] = 0;
+              $posts[$post_id]["downvotes"] = 0;
+            }
+            if (!isset($posts[$post_id]["voters"][$ip])) {
+              $posts[$post_id]["voters"][$ip] = 1;
+              ($upvote == 1 ? $posts[$post_id]["upvotes"]++ : $posts[$post_id]["downvotes"]++);
+            }
+          }
+        }
+        foreach ($posts as $post) 
+        {
+          if (!isset($post["upvotes"])) {
+            $post["upvotes"] = $post["downvotes"] = 0;
+          }
+          echo $post['Title'] . " " . $post["upvotes"] . "/" . ($post["upvotes"] + $post["downvotes"]) . "<br>\n";
+        }
       }
       elseif ( isset($this->titles[$url]) ) // Display a post
       {
@@ -230,25 +270,26 @@ IndexIgnore *";
   public function isPasswordCorrect()
   {
     if (isset($_POST['password'])) {
+      include("bbdata_blockedips.php");
       // blocked
-      if (isset($this->blocked_ips[$_SERVER['REMOTE_ADDR']]) && $this->blocked_ips[$_SERVER['REMOTE_ADDR']]['count'] > 20 && $this->blocked_ips[$_SERVER['REMOTE_ADDR']]['last_attempt'] > (time()-1800)) {
+      if (isset($blocked_ips[$_SERVER['REMOTE_ADDR']]) && $blocked_ips[$_SERVER['REMOTE_ADDR']]['count'] > 20 && $blocked_ips[$_SERVER['REMOTE_ADDR']]['last_attempt'] > (time()-1800)) {
         die("Too many bad password attempts. Wait 30 minutes then try again.");
       } // not blocked and correct
       elseif (md5($_POST['password'] . "breckrand") == $this->password) {
-        if (isset($this->blocked_ips[$_SERVER['REMOTE_ADDR']])) {
-          unset($this->blocked_ips[$_SERVER['REMOTE_ADDR']]);
-          $this->saveData();
+        if (isset($blocked_ips[$_SERVER['REMOTE_ADDR']])) {
+          unset($blocked_ips[$_SERVER['REMOTE_ADDR']]);
+          file_put_contents("bbdata_blockedips.php", "<?php \$blocked_ips= " . var_export($blocked_ips, true) . "?>");
         }
         return true;
       } // not blocked and incorrect
       else {
-        if (isset($this->blocked_ips[$_SERVER['REMOTE_ADDR']])) {
-          $this->blocked_ips[$_SERVER['REMOTE_ADDR']]['count']++;
-          $this->blocked_ips[$_SERVER['REMOTE_ADDR']]['last_attempt'] = time();
+        if (isset($blocked_ips[$_SERVER['REMOTE_ADDR']])) {
+          $blocked_ips[$_SERVER['REMOTE_ADDR']]['count']++;
+          $blocked_ips[$_SERVER['REMOTE_ADDR']]['last_attempt'] = time();
         } else {
-          $this->blocked_ips[$_SERVER['REMOTE_ADDR']] = array('count' => 1, 'last_attempt' => time());
+          $blocked_ips[$_SERVER['REMOTE_ADDR']] = array('count' => 1, 'last_attempt' => time());
         }
-        $this->saveData();
+        file_put_contents("bbdata_blockedips.php", "<?php \$blocked_ips= " . var_export($blocked_ips, true) . "?>");
       }
     }
     die("Invalid Password");
@@ -274,12 +315,12 @@ IndexIgnore *";
         $time = time();
         if (strlen($_POST['title']) < 1){ die("Title can't be blank"); }
         $this->posts[$time] = array("Title" => $_POST['title'], "Essay" => $_POST['essay']);
-        $this->flashSuccessMessage("<a href=\"".$this->createPrettyPermalink($_POST['title'])."\">Post created!</a> | <a href=\"write?post={$time}\">Edit it</a>");
+        $this->flashSuccessMessage("<a href=\"".$this->createPrettyPermalink($_POST['title'])."\">Post created!</a> | <a href=\"bbwrite?post={$time}\">Edit it</a>");
       }
       elseif (isset($this->posts[$_GET['post']]) && isset($_POST['delete'])) // delete a post
       {
         unset($this->posts[$_GET['post']]);$this->saveData();
-        $this->flashSuccessMessage("Post deleted. <a href=\"write\">Back</a>");exit;
+        $this->flashSuccessMessage("Post deleted. <a href=\"bbwrite\">Back</a>");exit;
       }
       elseif (isset($this->posts[$_GET['post']])) // edit a post
       {
@@ -296,8 +337,8 @@ IndexIgnore *";
    */
   public function saveData()
   {
-    $data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password, "blocked_ips" => $this->blocked_ips);
-    file_put_contents("data.php", "<?php \$data= ".var_export($data, true) . "?>");
+    $data = array("posts" => $this->posts, "settings" => $this->settings, "password" => $this->password);
+    file_put_contents("bbdata.php", "<?php \$data= ".var_export($data, true) . "?>");
   }
 
   /**
@@ -324,9 +365,9 @@ IndexIgnore *";
       $title_value = $this->posts[$_GET['post']]['Title'];
       $essay_value = $this->posts[$_GET['post']]['Essay'];
       $edit_action = "?post=" . (int)$_GET['post'];
-      $delete_button = "<input type=\"submit\" value=\"Delete\" name=\"delete\" onclick=\"return confirm('DELETE. Are you sure?');\"><br><br><a href=\"write\">Create new post</a>";
+      $delete_button = "<input type=\"submit\" value=\"Delete\" name=\"delete\" onclick=\"return confirm('DELETE. Are you sure?');\"><br><br><a href=\"bbwrite\">Create new post</a>";
     }
-    is_writable("data.php") or die("WARNING! data.php not writeable");
+    is_writable("bbdata.php") or die("WARNING! bbdata.php not writeable");
     ?><!doctype html>
     <html>
     <head>
@@ -338,10 +379,10 @@ IndexIgnore *";
       </style>
     </head>
     <body>
-      <?php if ($_SERVER['SERVER_PORT'] == 80) {echo "WARNING! Non-https connection. <a href=\"https".str_replace("index.php", "write", substr(BLOG_URL,4))."\">Switch to https</a>.";}?>
+      <?php if ($_SERVER['SERVER_PORT'] == 80) {echo "<br>WARNING! Non-https connection. <a href=\"https".str_replace("index.php", "bbwrite", substr(BLOG_URL,4))."\">Switch to https</a>.";}?>
       <table cellpadding="10px"><tr>
         <td width="62.5%">
-          <form method="post" action="write<?php echo $edit_action;?>">
+          <form method="post" action="bbwrite<?php echo $edit_action;?>">
             <table>
               <tr>
                 <td>Title</td>
@@ -370,21 +411,28 @@ IndexIgnore *";
             <b>Posts</b><br>
             <?php foreach ($this->posts as $key => $array) // display links to edit posts
             {
-              echo "<a href=\"" . $this->createPrettyPermalink($array['Title']) . "\">{$array['Title']}</a> | <a href=\"write?post=".$key."\">edit</a><br>";
+              echo "<a href=\"" . $this->createPrettyPermalink($array['Title']) . "\">{$array['Title']}</a> | <a href=\"bbwrite?post=".$key."\">edit</a><br>";
             }
             ?>
           </div>
           <div>
             <b>Upload File</b>
-            <form action="upload" method="post" enctype="multipart/form-data">
+            <form action="bbupload" method="post" enctype="multipart/form-data">
               <input type="file" name="file">
               <br>Password<br><input type="password" name="password">
               <input type="submit" value="Upload">
             </form>
           </div>
           <div>
+            <b>Stats</b>
+            <form method="post" action="bbstats">
+              Password
+              <input type="password" name="password"><input type="submit" value="View Stats">
+            </form>
+          </div>
+          <div>
             <b>Settings</b>
-            <form method="post" action="editsettings">
+            <form method="post" action="bbeditsettings">
               <?php foreach ($this->settings as $key => $value)
               {?><?php echo ucfirst(strtolower(str_replace("_"," ",$key)));?><br><textarea style="width:100%;" rows="7" name="<?php echo $key;?>"><?php echo htmlentities($value);?></textarea><br><br><?php }?>
               Password<br><input type="password" name="password">
@@ -394,7 +442,7 @@ IndexIgnore *";
           <div>
             <b>Upgrade</b>
             <br>brecksblog version: <?php echo $this->version;?><br>
-            <form action="upgrade" method="post">
+            <form action="bbupgrade" method="post">
               Password<br><input type="password" name="password"><input type="submit" value="Upgrade">
             </form>
           </div>
@@ -410,7 +458,7 @@ IndexIgnore *";
    */
   public function installIfNotInstalled()
   {
-    if (file_exists("data.php") || file_exists(".htaccess"))
+    if (file_exists("bbdata.php") || file_exists(".htaccess"))
         return; // Already installed.
     elseif (!isset($_POST['password']) || strlen($_POST['password']) < 1 ) 
     {
@@ -424,6 +472,8 @@ IndexIgnore *";
     else // Run the install
     {
       file_put_contents(".htaccess", $this->htaccess);
+      file_put_contents("bbdata_votes.php", "<?php\n");
+      file_put_contents("bbdata_blockedips.php", "<?php \$blocked_ips= " . var_export(array(), true) . "?>");
       $this->password = md5($_POST['password'] . "breckrand");
       $this->posts = array( 1259736228 => array('Title' => 'Hello World',
         'Essay' => 'Your first blog post!'));
