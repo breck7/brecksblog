@@ -10,7 +10,8 @@
  *
  * @author    Breck Yunits
  * @license   MIT
- * @url       http://github.com/breck7/brecksblog
+ * @homepage  http://brecksblog.com
+ * @source    http://github.com/breck7/brecksblog
  */
 class BrecksBlog {
 

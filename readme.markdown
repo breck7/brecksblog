@@ -76,10 +76,10 @@ Released under the MIT license.
 ### Todo
 
 - integrate real time stats
-- integrate post upvoting/downvoting
 - integrate similar posts
 - allow for more theme/style customization.
 - make it more user friendly
+- themes, real time stats, comments, user manual
 
 - Get it under 400 lines.
 - Reduce long lines to under 80 characters.
